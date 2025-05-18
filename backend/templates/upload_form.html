@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir tu Podcast - Ambaria</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background-color: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="file"], input[type="text"], textarea, select, button { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Subir tu Podcast</h1>
+        <form method="POST" action="/upload" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="audio_file">Archivo de Audio:</label>
+                <input type="file" id="audio_file" name="audio_file" accept="audio/*" required>
+            </div>
+            <div class="form-group">
+                <label for="title">Título:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Descripción:</label>
+                <textarea id="description" name="description" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="category">Categoría:</label>
+                <select id="category" name="category">
+                    <option value="amor">Amor</option>
+                    <option value="trabajo">Trabajo</option>
+                    <option value="familia">Familia</option>
+                    <option value="amigas">Amigas</option>
+                    <option value="otras">Otras</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="cover_image">Imagen de Portada (Opcional):</label>
+                <input type="file" id="cover_image" name="cover_image" accept="image/*">
+            </div>
+            <button type="submit">Subir Podcast</button>
+        </form>
+    </div>
+</body>
+</html>
