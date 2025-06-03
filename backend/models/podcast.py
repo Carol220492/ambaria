@@ -1,4 +1,5 @@
-from ..app import db
+from flask import Blueprint, jsonify
+from ..extensions import db # AHORA IMPORTA db DESDE extensions.py
 
 class Podcast(db.Model):
     id = db.Column(db.Integer, primary_key=True)
