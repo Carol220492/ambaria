@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from ..extensions import db # AHORA IMPORTA db DESDE extensions.py
+from backend.extensions import db # AHORA IMPORTA db DESDE extensions.py
 
 class Podcast(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -9,6 +9,7 @@ class Podcast(db.Model):
     audio_path = db.Column(db.String(255), nullable=False)
     cover_image_path = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # <--- ¡NUEVA COLUMNA!
 
     def __repr__(self):
         return f'<Podcast {self.title}>'

@@ -1,0 +1,15 @@
+[
+    {
+        "domain": "127.0.0.1",
+        "hostOnly": true,
+        "httpOnly": true,
+        "name": "session",
+        "path": "/",
+        "sameSite": "unspecified",
+        "secure": false,
+        "session": true,
+        "storeId": "0",
+        "value": "eyJlbWFpbCI6ImFuYWxhbmNvbW10eTIwMjFAZ21haWwuY29tIiwiZ29vZ2xlX2lkIjoiMTA1NTE2MTEzNjkwNDkzOTA3MzAzIiwidXNlcl9pZCI6MX0.aEAJPQ.RizoGBBomrGzxoNd3g2z3vOPYj0",
+        "id": 1
+    }
+]

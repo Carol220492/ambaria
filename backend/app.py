@@ -3,35 +3,24 @@ import os
 import requests
 import json
 from dotenv import load_dotenv
+from flask_migrate import Migrate # <--- AÑADE ESTA LÍNEA
+
 
 load_dotenv() # Cargar variables de entorno al iniciar la aplicación
 
-# --- INICIO DE LOS CAMBIOS CRUCIALES EN LAS IMPORTACIONES ---
+from backend.extensions import db
+from backend.models.user import User
 
-# ELIMINA ESTA LÍNEA (si está presente en tu app.py actual)
-# from flask_sqlalchemy import SQLAlchemy
-
-# IMPORTA la instancia de 'db' desde tu nuevo archivo 'extensions.py' usando ABSOLUTA
-from backend.extensions import db # <--- ¡CAMBIO IMPORTANTE AQUÍ!
-
-# IMPORTA el nuevo modelo de User usando ABSOLUTA
-from backend.models.user import User # <--- ¡CAMBIO IMPORTANTE AQUÍ!
-
-# IMPORTA los blueprints de rutas usando ABSOLUTA
-from backend.routes.upload_routes import upload_bp # <--- ¡CAMBIO IMPORTANTE AQUÍ!
-from backend.routes.podcast_routes import podcast_bp # <--- ¡CAMBIO IMPORTANTE AQUÍ!
-
-# --- FIN DE LOS CAMBIOS CRUCIALES EN LAS IMPORTACIONES ---
-
+from backend.routes.upload_routes import upload_bp
+from backend.routes.podcast_routes import podcast_bp
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 
-# Inicializamos 'db' con tu aplicación 'app'
 db.init_app(app)
+migrate = Migrate(app, db) # <--- NUEVA LÍNEA
 
 # Configuración de Google OAuth 2.0 (obtenidas de la Consola de Google Cloud)
-# Ahora leyendo de variables de entorno para mayor seguridad
 app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
 app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET')
 app.config['GOOGLE_AUTHORIZE_URL'] = 'https://accounts.google.com/o/oauth2/auth'
@@ -39,8 +28,9 @@ app.config['GOOGLE_TOKEN_URL'] = 'https://oauth2.googleapis.com/token'
 app.config['GOOGLE_USERINFO_URL'] = 'https://www.googleapis.com/oauth2/v1/userinfo'
 app.config['GOOGLE_SCOPES'] = ['openid', 'email', 'profile']
 
-app.register_blueprint(upload_bp, url_prefix='/')
-app.register_blueprint(podcast_bp, url_prefix='/podcasts')
+# Registrar Blueprints
+app.register_blueprint(upload_bp, url_prefix='/') # Si upload_bp maneja la raíz o es un blueprint general
+app.register_blueprint(podcast_bp, url_prefix='/podcasts') # El Blueprint de podcasts con su prefijo
 
 # --- Rutas de Autenticación de Google ---
 
@@ -139,29 +129,14 @@ def logout():
     session.pop('email', None)
     return jsonify({"message": "Sesión cerrada con éxito."})
 
-# --- Mantener tus rutas existentes ---
+# --- Mantener tus rutas existentes (¡NO ELIMINAR ESTA!): ---
 @app.route('/')
 def hello():
-    try:
-        resultado = 10 / 0
-        return "Resultado: {}".format(resultado)
-    except ZeroDivisionError:
-        return jsonify({"error": "¡Error! División por cero.", "code": 400}), 400
+    # Asegúrate de haber eliminado la línea "resultado = 10 / 0" si no la necesitas.
+    return jsonify({"message": "Bienvenido a la API de Ambaria."}), 200
 
-@app.route('/podcasts', methods=['POST'])
-def create_podcast():
-    try:
-        data = request.get_json()
-        if not data or 'title' not in data or 'description' not in data:
-            return jsonify({"error": "Faltan datos requeridos.", "code": 400}), 400
-
-        db.session.commit()
-        return jsonify({"message": "Podcast creado con éxito (simulado).", "code": 201}), 201
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e), "code": 500}), 500
-
+# # --- LA RUTA DUPLICADA DE '/podcasts' HA SIDO ELIMINADA DE AQUÍ. ---
+# # LA GESTIÓN DE PODCASTS AHORA SE HACE COMPLETAMENTE DESDE podcast_routes.py.
 
 if __name__ == '__main__':
     if not app.config['GOOGLE_CLIENT_ID'] or not app.config['GOOGLE_CLIENT_SECRET']:
