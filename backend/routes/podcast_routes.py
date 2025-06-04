@@ -21,10 +21,10 @@ def allowed_file(filename, allowed_extensions):
 @podcast_bp.route('/', methods=['POST'])
 def create_podcast():
     # Asegúrate de que el usuario esté autenticado
-     if 'user_id' not in session: # <--- ¡COMENTA ESTA LÍNEA!
-    #    return jsonify({"error": "No autenticado. Inicia sesión para crear un podcast.", "code": 401}), 401
+    if 'user_id' not in session:
+        return jsonify({"error": "No autenticado. Inicia sesión para crear un podcast.", "code": 401}), 401
 
-    #user_id = 1 # <--- ¡DESCOMENTA Y USA ESTA LÍNEA TEMPORALMENTE PARA LA PRUEBA! (Asegúrate de que haya un usuario con ID 1 en tu tabla 'user' si ya la creaste)
+    user_id = session['user_id']
 
     # Si no se envía ningún archivo en la solicitud
     if 'audio_file' not in request.files:
@@ -75,7 +75,7 @@ def create_podcast():
             category=category,
             audio_path=os.path.join(current_app.config['UPLOAD_FOLDER'], audio_filename),
             cover_image_path=os.path.join(current_app.config['UPLOAD_FOLDER'], image_filename) if cover_image_filepath else None,
-            user_id=user_id # Asignar el ID del usuario logueado (ahora fijo en 1)
+            user_id=user_id
         )
         db.session.add(new_podcast)
         db.session.commit()
