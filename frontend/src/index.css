@@ -1,0 +1,43 @@
+/* frontend/src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;700&display=swap');
+/* Mantengo Cinzel y Montserrat por ahora, pero la fuente del logo es crucial */
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif; /* Fuente por defecto */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* Evitar scroll horizontal */
+  
+ background-image: url('./assets/background.jpg'); /* Ruta a tu imagen */
+  background-size: cover; /* Cubre toda la pantalla sin distorsionar */
+  background-position: center center; /* Centra la imagen */
+  background-attachment: fixed; /* Mantiene la imagen fija al hacer scroll */
+  background-repeat: no-repeat; /* Evita que la imagen se repita */
+
+   min-height: 100vh;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Estilos de scrollbar con la nueva paleta */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0c0c1b; /* Azul oscuro */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #00b3b3; /* Turquesa oscuro */
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #00FFFF; /* Turquesa brillante */
+}

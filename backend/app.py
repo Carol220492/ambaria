@@ -4,6 +4,8 @@ import requests
 import json
 from dotenv import load_dotenv
 from flask_migrate import Migrate # <--- AÑADE ESTA LÍNEA
+from flask_cors import CORS # <--- AÑADE ESTA LÍNEA
+
 
 
 load_dotenv() # Cargar variables de entorno al iniciar la aplicación
@@ -16,6 +18,8 @@ from backend.routes.podcast_routes import podcast_bp
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
+
+CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 
 db.init_app(app)
 migrate = Migrate(app, db) # <--- NUEVA LÍNEA
