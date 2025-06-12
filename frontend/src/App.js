@@ -1,30 +1,49 @@
+// frontend/src/App.js
 import React from 'react';
-import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; 
-import Profile from './components/Profile'; 
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Home from './components/Home';
+import Profile from './components/Profile';
+import AuthHandler from './components/AuthHandler';
+import HomePodcasts from './components/HomePodcasts';
+import UploadPodcast from './components/UploadPodcast'; // <-- ¡NUEVA IMPORTACIÓN!
+
+const PrivateRoute = ({ children }) => {
+  const isAuthenticated = localStorage.getItem('jwt_token');
+  return isAuthenticated ? children : <Navigate to="/" />;
+};
 
 function App() {
   return (
-       <Router> 
+    <Router>
       <div className="App">
-        {/* Define tus rutas aquí */}
         <Routes>
-          {/* Ruta para la página principal (la de inicio de sesión) */}
-          <Route path="/" element={
-            <header className="App-header">
-              <h1>¡Bienvenida a Ambaria!</h1>
-              <p>Tu plataforma para conectar y compartir podcasts.</p>
-              {/* El botón de login sigue apuntando al backend, lo cual es correcto para iniciar OAuth */}
-              <a href="http://127.0.0.1:5000/login">
-                <button>Iniciar sesión con Google</button>
-              </a>
-            </header>
-          } />
-          
-          {/* Ruta para la página de perfil */}
-          <Route path="/profile" element={<Profile />} /> {/* Este componente Profile se cargará en /profile */}
-          
-          {/* Puedes añadir más rutas aquí en el futuro si las necesitas */}
+          <Route path="/" element={<Home />} />
+          <Route path="/auth-handler" element={<AuthHandler />} />
+          {/* Rutas Protegidas */}
+          <Route 
+            path="/profile" 
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/home-podcasts" 
+            element={
+              <PrivateRoute>
+                <HomePodcasts />
+              </PrivateRoute>
+            } 
+          />
+          <Route // <-- ¡NUEVA RUTA PROTEGIDA!
+            path="/upload-podcast" 
+            element={
+              <PrivateRoute>
+                <UploadPodcast />
+              </PrivateRoute>
+            } 
+          />
         </Routes>
       </div>
     </Router>

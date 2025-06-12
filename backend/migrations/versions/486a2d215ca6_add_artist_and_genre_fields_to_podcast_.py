@@ -1,8 +1,8 @@
-"""Initial migration
+"""Add artist and genre fields to Podcast model
 
-Revision ID: ed1c337e3786
+Revision ID: 486a2d215ca6
 Revises: 
-Create Date: 2025-06-04 13:15:40.845817
+Create Date: 2025-06-12 11:09:36.347637
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ed1c337e3786'
+revision = '486a2d215ca6'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -31,8 +31,9 @@ def upgrade():
     op.create_table('podcast',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=200), nullable=False),
+    sa.Column('artist', sa.String(length=100), nullable=False),
+    sa.Column('genre', sa.String(length=50), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('category', sa.String(length=50), nullable=False),
     sa.Column('audio_path', sa.String(length=255), nullable=False),
     sa.Column('cover_image_path', sa.String(length=255), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
