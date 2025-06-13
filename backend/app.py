@@ -42,7 +42,7 @@ app.config['GOOGLE_SCOPES'] = ['openid', 'email', 'profile']
 
 # Registrar Blueprints
 app.register_blueprint(upload_bp, url_prefix='/')
-app.register_blueprint(podcast_bp, url_prefix='/podcasts')
+app.register_blueprint(podcast_bp)
 
 @app.route('/login')
 def login():
