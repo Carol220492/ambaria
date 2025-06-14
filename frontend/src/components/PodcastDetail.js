@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; // Importa useParams para leer el ID de la URL
+import axios from 'axios'; // ¡NUEVA IMPORTACIÓN DE AXIOS!
 
 const PodcastDetail = () => {
   const { id } = useParams(); // Obtiene el ID del podcast de la URL
@@ -21,34 +22,37 @@ const PodcastDetail = () => {
       try {
         const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
         console.log(`DEBUG PODCAST DETAIL: Obteniendo detalles del podcast ${id} de: ${API_URL}/podcasts/${id}`);
-        const response = await fetch(`${API_URL}/podcasts/${id}`, {
+        
+        // --- INICIO DE CAMBIO A AXIOS ---
+        // Axios lanza un error para respuestas no 2xx, simplificando el if(!response.ok)
+        const response = await axios.get(`${API_URL}/podcasts/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
 
-        if (!response.ok) {
-          if (response.status === 404) {
+        // Axios devuelve la data JSON directamente en response.data
+        const data = response.data;
+        console.log("DEBUG PODCAST DETAIL: Detalles recibidos:", data);
+        setPodcast(data); // Manteniendo tu lógica original de cómo asignabas la respuesta
+        setLoading(false);
+
+      } catch (err) {
+        // --- MANEJO DE ERRORES CON AXIOS ---
+        console.error("Error al obtener detalles del podcast:", err);
+        if (axios.isAxiosError(err) && err.response) { // Verificar si es un error de Axios con respuesta
+          if (err.response.status === 404) {
             setError("Podcast no encontrado.");
-          } else if (response.status === 401) {
+          } else if (err.response.status === 401) {
             localStorage.removeItem('jwt_token');
             setError("Tu sesión ha expirado. Por favor, inicia sesión de nuevo.");
             navigate('/');
           } else {
-            setError(`Error al cargar los detalles del podcast: ${response.statusText}`);
+            setError(`Error al cargar los detalles del podcast: ${err.response.statusText || err.message}`);
           }
-          setLoading(false);
-          return;
+        } else { // Si no es un error de Axios o no tiene respuesta
+          setError("No se pudo conectar con el servidor o cargar los detalles del podcast.");
         }
-
-        const data = await response.json();
-        console.log("DEBUG PODCAST DETAIL: Detalles recibidos:", data);
-        setPodcast(data);
-        setLoading(false);
-
-      } catch (err) {
-        console.error("Error al obtener detalles del podcast:", err);
-        setError("No se pudo conectar con el servidor o cargar los detalles del podcast.");
         setLoading(false);
       }
     };
