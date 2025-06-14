@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Importa useParams para leer el ID de la URL
-import axios from 'axios'; // ¡NUEVA IMPORTACIÓN DE AXIOS!
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import useAudioPlayerStore from '../store/useAudioPlayerStore'; // ¡NUEVA IMPORTACIÓN DEL STORE!
+import { FaPlay, FaPause } from 'react-icons/fa'; // Iconos para el botón de reproducir
 
 const PodcastDetail = () => {
-  const { id } = useParams(); // Obtiene el ID del podcast de la URL
+  const { id } = useParams();
   const navigate = useNavigate();
   const [podcast, setPodcast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Acceder a las funciones y estado del store de Zustand
+  const playPodcast = useAudioPlayerStore((state) => state.playPodcast);
+  const pausePodcast = useAudioPlayerStore((state) => state.pausePodcast); // Para un botón de pausa explícito
+  const togglePlayPause = useAudioPlayerStore((state) => state.togglePlayPause);
+  const currentPodcast = useAudioPlayerStore((state) => state.currentPodcast);
+  const isPlaying = useAudioPlayerStore((state) => state.isPlaying);
 
   useEffect(() => {
     const fetchPodcastDetails = async () => {
@@ -15,32 +24,28 @@ const PodcastDetail = () => {
       if (!token) {
         setError("No autenticado. Por favor, inicia sesión.");
         setLoading(false);
-        navigate('/'); // Redirige al login si no hay token
+        navigate('/');
         return;
       }
 
       try {
         const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
         console.log(`DEBUG PODCAST DETAIL: Obteniendo detalles del podcast ${id} de: ${API_URL}/podcasts/${id}`);
-        
-        // --- INICIO DE CAMBIO A AXIOS ---
-        // Axios lanza un error para respuestas no 2xx, simplificando el if(!response.ok)
         const response = await axios.get(`${API_URL}/podcasts/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
 
-        // Axios devuelve la data JSON directamente en response.data
+        // Manteniendo tu lógica original de cómo asignabas la respuesta
         const data = response.data;
         console.log("DEBUG PODCAST DETAIL: Detalles recibidos:", data);
-        setPodcast(data); // Manteniendo tu lógica original de cómo asignabas la respuesta
+        setPodcast(data);
         setLoading(false);
 
       } catch (err) {
-        // --- MANEJO DE ERRORES CON AXIOS ---
         console.error("Error al obtener detalles del podcast:", err);
-        if (axios.isAxiosError(err) && err.response) { // Verificar si es un error de Axios con respuesta
+        if (axios.isAxiosError(err) && err.response) {
           if (err.response.status === 404) {
             setError("Podcast no encontrado.");
           } else if (err.response.status === 401) {
@@ -50,7 +55,7 @@ const PodcastDetail = () => {
           } else {
             setError(`Error al cargar los detalles del podcast: ${err.response.statusText || err.message}`);
           }
-        } else { // Si no es un error de Axios o no tiene respuesta
+        } else {
           setError("No se pudo conectar con el servidor o cargar los detalles del podcast.");
         }
         setLoading(false);
@@ -58,7 +63,7 @@ const PodcastDetail = () => {
     };
 
     fetchPodcastDetails();
-  }, [id, navigate]); // Dependencias: se ejecuta cuando cambia el ID o navigate
+  }, [id, navigate]);
 
   if (loading) {
     return (
@@ -90,6 +95,9 @@ const PodcastDetail = () => {
     );
   }
 
+  // Comprobar si este podcast es el que se está reproduciendo actualmente en el reproductor global
+  const isThisPodcastPlaying = currentPodcast && currentPodcast.id === podcast.id && isPlaying;
+
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: '20px auto', background: 'rgba(26, 26, 64, 0.9)', borderRadius: '10px', boxShadow: '0 0 15px rgba(0, 255, 255, 0.5)' }}>
       <button onClick={() => navigate('/home-podcasts')} style={{ float: 'right', padding: '8px 15px', backgroundColor: '#cc00cc', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
@@ -113,12 +121,40 @@ const PodcastDetail = () => {
         </div>
       </div>
       
-      {podcast.audio_url && (
+      {/* ¡NUEVO BOTÓN PARA CONTROLAR LA REPRODUCCIÓN GLOBAL! */}
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <button
+          onClick={() => isThisPodcastPlaying ? pausePodcast() : playPodcast(podcast)}
+          style={{
+            padding: '12px 30px',
+            backgroundColor: isThisPodcastPlaying ? '#e600e6' : '#cc00cc', // Cambia color si está reproduciendo
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '1.5em',
+            fontWeight: 'bold',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '10px',
+            transition: 'background-color 0.3s ease, transform 0.2s ease',
+            boxShadow: '0 4px 15px rgba(0, 255, 255, 0.4)'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        >
+          {isThisPodcastPlaying ? <FaPause /> : <FaPlay />}
+          {isThisPodcastPlaying ? 'Pausar Podcast' : 'Reproducir Podcast'}
+        </button>
+      </div>
+
+      {/* Eliminado el <audio controls> nativo ya que usamos el reproductor global */}
+      {/* podcast.audio_url && (
           <audio controls style={{ width: '100%', marginTop: '20px' }}>
               <source src={podcast.audio_url} type="audio/mpeg" />
               Tu navegador no soporta el elemento de audio.
           </audio>
-      )}
+      ) */}
     </div>
   );
 };
