@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity 
+import urllib.parse # <-- ¡NUEVA IMPORTACIÓN!
+from backend.config import Config # Añade esta línea
 
 load_dotenv() # Cargar variables de entorno al iniciar la aplicación
 
@@ -18,7 +20,13 @@ from backend.routes.upload_routes import upload_bp
 from backend.routes.podcast_routes import podcast_bp
 
 app = Flask(__name__)
-app.config.from_pyfile('config.py')
+app.config.from_object(Config) # Cambiado de from_pyfile a from_object
+print(f"DEBUG APP: SQLALCHEMY_DATABASE_URI cargado: {app.config.get('SQLALCHEMY_DATABASE_URI')}") # Mantenemos el debug print
+
+instance_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance')
+if not os.path.exists(instance_path):
+    os.makedirs(instance_path)
+    print(f"DEBUG APP: Creada carpeta de instancia: {instance_path}")
 
 app.secret_key = app.config['SECRET_KEY'] 
 
@@ -36,108 +44,108 @@ jwt = JWTManager(app)
 app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
 app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET')
 app.config['GOOGLE_AUTHORIZE_URL'] = 'https://accounts.google.com/o/oauth2/auth'
-app.config['GOOGLE_TOKEN_URL'] = 'https://oauth2.googleapis.com/token'
+app.config['GOOGLE_TOKEN_URL'] = 'https://accounts.google.com/o/oauth2/token'
 app.config['GOOGLE_USERINFO_URL'] = 'https://www.googleapis.com/oauth2/v1/userinfo'
-app.config['GOOGLE_SCOPES'] = ['openid', 'email', 'profile']
+app.config['GOOGLE_REDIRECT_URI'] = os.environ.get('GOOGLE_REDIRECT_URI') or 'http://localhost:5000/auth/google/callback'
 
 # Registrar Blueprints
-app.register_blueprint(upload_bp, url_prefix='/')
+app.register_blueprint(upload_bp)
 app.register_blueprint(podcast_bp)
 
-@app.route('/login')
-def login():
-    google_authorize_url = app.config['GOOGLE_AUTHORIZE_URL']
-    client_id = app.config['GOOGLE_CLIENT_ID']
-    # Esta línea genera http://localhost:5000/callback (o la que Flask decida por _external=True)
-    redirect_uri = url_for('callback', _external=True) 
-    scope = ' '.join(app.config['GOOGLE_SCOPES'])
+# --- Rutas de Autenticación con Google OAuth ---
+@app.route('/auth/google')
+def google_oauth_login():
+    """Redirige al usuario a la página de inicio de sesión de Google."""
+    print("DEBUG BACKEND: Iniciando flujo de autenticación de Google.")
+    params = {
+        'response_type': 'code',
+        'client_id': app.config['GOOGLE_CLIENT_ID'],
+        'redirect_uri': app.config['GOOGLE_REDIRECT_URI'],
+        'scope': 'openid email profile',
+        'access_type': 'offline',
+        'prompt': 'consent' # Opcional: 'select_account' o 'consent' si quieres forzar la selección de cuenta o el consentimiento
+    }
+    # return redirect(f"{app.config['GOOGLE_AUTHORIZE_URL']}?{requests.utils.urlencode(params)}") # Línea anterior
+    return redirect(f"{app.config['GOOGLE_AUTHORIZE_URL']}?{urllib.parse.urlencode(params)}") # <-- ¡CAMBIO CLAVE AQUÍ!
 
-    auth_url = (
-        f"{google_authorize_url}?"
-        f"client_id={client_id}&"
-        f"redirect_uri={redirect_uri}&"
-        f"scope={scope}&"
-        f"response_type=code"
-    )
-    # DEBUG: Flask está enviando esta redirect_uri a Google: http://localhost:5000/callback
-    print(f"DEBUG: Flask está enviando esta redirect_uri a Google: {redirect_uri}") # Puedes quitar esta línea después
-    return redirect(auth_url)
-
-@app.route('/callback')
-def callback():
+@app.route('/auth/google/callback')
+def google_oauth_callback():
+    """Maneja la devolución de llamada de Google OAuth."""
     code = request.args.get('code')
     if not code:
-        return jsonify({"message": "Falta el código de autorización de Google."}), 400
+        print("DEBUG BACKEND: No se recibió código de autorización de Google.")
+        return jsonify({"error": "No se recibió el código de autorización."}), 400
 
-    token_url = app.config['GOOGLE_TOKEN_URL']
-    client_id = app.config['GOOGLE_CLIENT_ID']
-    client_secret = app.config['GOOGLE_CLIENT_SECRET']
-    redirect_uri = url_for('callback', _external=True)
-
-    token_payload = {
+    # Intercambiar código por token de acceso
+    token_params = {
         'code': code,
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'redirect_uri': redirect_uri,
-        'grant_type': 'authorization_code',
+        'client_id': app.config['GOOGLE_CLIENT_ID'],
+        'client_secret': app.config['GOOGLE_CLIENT_SECRET'],
+        'redirect_uri': app.config['GOOGLE_REDIRECT_URI'],
+        'grant_type': 'authorization_code'
     }
+    token_response = requests.post(app.config['GOOGLE_TOKEN_URL'], data=token_params)
+    token_data = token_response.json()
 
-    try:
-        token_response = requests.post(token_url, data=token_payload)
-        token_response.raise_for_status() 
-        tokens = token_response.json()
-        access_token = tokens['access_token']
+    if 'access_token' not in token_data:
+        print(f"DEBUG BACKEND: Error al obtener token de acceso: {token_data.get('error_description', token_data)}")
+        return jsonify({"error": "Error al obtener el token de acceso de Google."}), 400
 
-        userinfo_url = app.config['GOOGLE_USERINFO_URL']
-        headers = {'Authorization': f'Bearer {access_token}'}
-        userinfo_response = requests.get(userinfo_url, headers=headers)
-        userinfo_response.raise_for_status()
-        user_info = userinfo_response.json()
+    access_token = token_data['access_token']
 
-        email = user_info.get('email')
-        name = user_info.get('name')
-        profile_picture = user_info.get('picture')
-        google_id = user_info.get('id') 
+    # Obtener información del usuario
+    userinfo_response = requests.get(app.config['GOOGLE_USERINFO_URL'], headers={'Authorization': f'Bearer {access_token}'})
+    user_info = userinfo_response.json()
 
-        user = User.query.filter_by(google_id=google_id).first()
-
-        if user is None:
-            user = User(google_id=google_id, email=email, name=name, profile_picture=profile_picture)
+    if user_info:
+        user = User.query.filter_by(google_id=user_info['id']).first()
+        if not user:
+            # Crear un nuevo usuario si no se encuentra
+            user = User(
+                google_id=user_info['id'],
+                email=user_info['email'],
+                name=user_info.get('name'),
+                profile_picture=user_info.get('picture')
+            )
             db.session.add(user)
             db.session.commit()
             print(f"DEBUG BACKEND: Nuevo usuario creado: {user.email}")
         else:
-            user.email = email
-            user.name = name
-            user.profile_picture = profile_picture
+            print(f"DEBUG BACKEND: Usuario existente encontrado: {user.email}")
+            # Opcionalmente, actualizar la información del usuario si cambia (ej. foto de perfil)
+            user.name = user_info.get('name')
+            user.profile_picture = user_info.get('picture')
             db.session.commit()
-            print(f"DEBUG BACKEND: Usuario existente actualizado: {user.email}")
 
-        # Crear el token JWT para el usuario, asegurando que la identidad sea un string
-        jwt_token = create_access_token(identity=str(user.id)) 
-        print(f"DEBUG BACKEND: Token JWT generado en callback: {jwt_token}")
-        
-        # --- CAMBIO CLAVE AQUÍ: Redirigir al frontend a /auth-callback para que el frontend maneje el token ---
-        return redirect(f'http://localhost:3000/auth-callback?token={jwt_token}')
+        # Generar token JWT
+        # Convierte user.id a string para el identity del token JWT
+        access_token = create_access_token(
+            identity=str(user.id),  
+            additional_claims={
+                "email": user.email,
+                "profile_picture": user.profile_picture
+            }
+        )
 
-    except requests.exceptions.RequestException as e:
-        print(f"DEBUG BACKEND: Error en la solicitud HTTP de Google OAuth: {e}")
-        return jsonify({"message": f"Error al procesar la autenticación con Google: {e}"}), 500
-    except json.JSONDecodeError as e:
-        print(f"DEBUG BACKEND: Error al decodificar JSON de Google OAuth: {e}")
-        return jsonify({"message": "Error al decodificar la respuesta de Google."}), 500
-    except Exception as e:
-        print(f"DEBUG BACKEND: Error inesperado en el callback de Google: {e}")
-        return jsonify({"message": f"Error inesperado en el callback: {e}"}), 500
+        frontend_redirect_url = os.environ.get('FRONTEND_URL', 'http://localhost:3000') + '/auth-callback'
+        print(f"DEBUG BACKEND: Redirigiendo a frontend: {frontend_redirect_url}?token={access_token}")
+        return redirect(f"{frontend_redirect_url}?token={access_token}")
+    else:
+        print("DEBUG BACKEND: No se pudo obtener la información del usuario de Google.")
+        return jsonify({"error": "No se pudo obtener la información del usuario de Google."}), 400
 
-@app.route('/profile')
-@jwt_required() # <--- ¡Este decorador se encarga de la verificación del token!
-def profile():
-    # get_jwt_identity() obtiene la identidad del token JWT ya verificado.
-    current_user_id = get_jwt_identity() 
-    print(f"DEBUG BACKEND: ID de usuario obtenido del JWT: {current_user_id}") 
+@app.route('/profile', methods=['GET'])
+@jwt_required()
+def get_profile():
+    current_user_id = get_jwt_identity()
+    print(f"DEBUG BACKEND: Intentando obtener perfil para user_id: {current_user_id}") 
 
-    user = User.query.get(current_user_id)
+    try:
+        user_id_int = int(current_user_id)
+    except ValueError:
+        return jsonify({"message": "ID de usuario inválido en el token."}), 400
+
+    user = User.query.get(user_id_int) 
 
     if user:
         print(f"DEBUG BACKEND: Usuario encontrado: {user.name}") 
@@ -170,6 +178,7 @@ if __name__ == '__main__':
         print("ADVERTENCIA: Las variables de entorno GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET no están configuradas.")
         print("La autenticación de Google no funcionará correctamente. Crea un archivo .env o configúralas manualmente.")
     if not app.config['JWT_SECRET_KEY']:
-        print("ADVERTENCIA: JWT_SECRET_KEY no está configurada. La autenticación JWT no funcionará correctamente.")
+        print("ADVERTENCIA: La variable de entorno JWT_SECRET_KEY no está configurada.")
+        print("Los tokens JWT no se firmarán correctamente. Crea un archivo .env o configúrala manualmente.")
     
-    # app.run(debug=True) # Descomenta si lo ejecutas directamente, no con 'flask run'
+    app.run(debug=True, port=5000)

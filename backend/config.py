@@ -1,17 +1,23 @@
-# backend/config.py
-
 import os
+from datetime import timedelta
 
-DEBUG = True
-UPLOAD_FOLDER = 'uploads'
-MAX_CONTENT_LENGTH = 100 * 1024 * 1024
-SECRET_KEY = os.environ.get('SECRET_KEY') or 'tu_clave_secreta_aqui_para_sesion' # Puedes mantenerla por si Flask la necesita para otras cosas
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'una_cadena_secreta_muy_dificil_de_adivinar_y_larga_12345'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance', 'site.db')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024 
 
-# Base de datos SQLite (para desarrollo)
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(BASE_DIR, 'ambarialocal.db')
-SQLALCHEMY_TRACK_MODIFICATIONS = False
+   
 
-# --- ¡NUEVAS LÍNEAS PARA JWT! ---
-JWT_SECRET_KEY = 'e8643662cab400ee1b76296f75bb1bcef1c6300eb7ef23e8b3c17c9267101a57' # <-- ¡Cambia esta cadena!
-JWT_TOKEN_LOCATION = ['headers', 'cookies', 'query_string'] # Le dice a Flask-JWT-Extended dónde buscar el token
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'super_secreta_clave_jwt_cambiala_en_produccion'
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
+    JWT_TOKEN_LOCATION = ['headers']
+
+    GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+    GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+    GOOGLE_AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/auth'
+    GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
+    GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo'
+    GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI') or 'http://localhost:5000/auth/callback'
+    SERVER_NAME = os.environ.get('FLASK_SERVER_NAME') or 'localhost:5000'

@@ -1,13 +1,13 @@
 // frontend/src/components/UploadPodcast.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import NavBar from './NavBar'; // Necesitarás el NavBar aquí también
+import NavBar from './NavBar'; // Asegúrate de que NavBar esté importado si lo usas
 
 const UploadPodcast = () => {
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
-    const [artist, setArtist] = useState('');
-    const [genre, setGenre] = useState('');
+    const [artist, setArtist] = useState(''); // Mantener este estado por ahora
+    const [genre, setGenre] = useState('');   // Este se mapea a 'category' en el backend
     const [description, setDescription] = useState('');
     const [audioFile, setAudioFile] = useState(null);
     const [coverImage, setCoverImage] = useState(null);
@@ -36,24 +36,41 @@ const UploadPodcast = () => {
         if (!token) {
             setError('No hay token de autenticación. Por favor, inicia sesión.');
             setLoading(false);
-            navigate('/'); // Redirigir al login si no hay token
+            navigate('/');
             return;
         }
 
-        if (!audioFile) {
-            setError('Por favor, selecciona un archivo de audio.');
-            setLoading(false);
-            return;
-        }
+        // --- AÑADE ESTOS CONSOLE.LOGS PARA DEBUGGING ---
+        console.log("DEBUG FRONTEND: Valores de estado antes de FormData:");
+        console.log("Título (state):", title);
+        console.log("Descripción (state):", description);
+        console.log("Categoría (state 'genre'):", genre);
+        console.log("Archivo de Audio (state):", audioFile ? audioFile.name : "Ninguno");
+        console.log("Imagen de Portada (state):", coverImage ? coverImage.name : "Ninguna");
 
         const formData = new FormData();
         formData.append('title', title);
-        formData.append('artist', artist);
-        formData.append('genre', genre);
         formData.append('description', description);
-        formData.append('audio_file', audioFile);
+        // formData.append('artist', artist); // Esta línea se eliminará cuando el campo artista se retire del formulario
+        formData.append('category', genre); // 'genre' se mapea a 'category' en el backend
+        if (audioFile) {
+            formData.append('audio_file', audioFile);
+        }
         if (coverImage) {
             formData.append('cover_image', coverImage);
+        }
+
+        // --- AÑADE ESTE CONSOLE.LOG PARA VER CONTENIDO REAL DE FormData ---
+        console.log("DEBUG FRONTEND: Contenido de FormData que se va a enviar:");
+        for (let pair of formData.entries()) {
+            console.log(pair[0]+ ': ' + pair[1]);
+        }
+
+        // Basic client-side validation (optional, but good practice)
+        if (!title || !description || !genre || !audioFile) {
+            setError('Por favor, rellena todos los campos obligatorios (título, descripción, categoría, archivo de audio).');
+            setLoading(false);
+            return;
         }
 
         try {
@@ -61,7 +78,7 @@ const UploadPodcast = () => {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    // 'Content-Type': 'multipart/form-data' // ¡IMPORTANTE! No establecer Content-Type para FormData, el navegador lo hace automáticamente y lo hace mal si lo pones tú.
+                    // 'Content-Type': 'multipart/form-data' no se establece aquí, fetch lo hace automáticamente
                 },
                 body: formData,
             });
@@ -71,21 +88,19 @@ const UploadPodcast = () => {
                 throw new Error(errorData.error || 'Error al subir el podcast.');
             }
 
-            const data = await response.json();
-            setMessage(data.message || 'Podcast subido con éxito.');
-            // Limpiar el formulario
+            setMessage('Podcast subido con éxito!');
+            // Limpiar los campos después de una subida exitosa
             setTitle('');
             setArtist('');
             setGenre('');
             setDescription('');
             setAudioFile(null);
             setCoverImage(null);
-            // Si quieres redirigir a HomePodcasts después de subir
-            // navigate('/home-podcasts'); 
-
+            // Opcional: navegar a la página de podcasts o a una confirmación
+            // navigate('/home-podcasts');
         } catch (err) {
             console.error('Error uploading podcast:', err);
-            setError(err.message || 'Error desconocido al subir el podcast.');
+            setError(`Error uploading podcast: ${err.message}`);
         } finally {
             setLoading(false);
         }
@@ -94,11 +109,10 @@ const UploadPodcast = () => {
     return (
         <div>
             <NavBar />
-            <div style={{ padding: '20px', maxWidth: '600px', margin: '20px auto', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                <h1>Subir Nuevo Podcast</h1>
-                {message && <p style={{ color: 'green' }}>{message}</p>}
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                
+            <div style={{ padding: '20px', maxWidth: '600px', margin: '20px auto', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '2px 2px 8px rgba(0,0,0,0.1)' }}>
+                <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Subir Nuevo Podcast</h2>
+                {message && <p style={{ color: 'green', textAlign: 'center' }}>{message}</p>}
+                {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                     <div>
                         <label htmlFor="title" style={{ display: 'block', marginBottom: '5px' }}>Título:</label>
@@ -111,19 +125,19 @@ const UploadPodcast = () => {
                             style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                         />
                     </div>
+                    {/* Mantener el campo artista por ahora para no romper el frontend, aunque no se envíe al backend */}
                     <div>
-                        <label htmlFor="artist" style={{ display: 'block', marginBottom: '5px' }}>Artista:</label>
+                        <label htmlFor="artist" style={{ display: 'block', marginBottom: '5px' }}>Artista (Ignorar por ahora):</label>
                         <input
                             type="text"
                             id="artist"
                             value={artist}
                             onChange={(e) => setArtist(e.target.value)}
-                            required
                             style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                         />
                     </div>
                     <div>
-                        <label htmlFor="genre" style={{ display: 'block', marginBottom: '5px' }}>Género:</label>
+                        <label htmlFor="genre" style={{ display: 'block', marginBottom: '5px' }}>Categoría:</label>
                         <input
                             type="text"
                             id="genre"
@@ -134,11 +148,12 @@ const UploadPodcast = () => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="description" style={{ display: 'block', marginBottom: '5px' }}>Descripción (Opcional):</label>
+                        <label htmlFor="description" style={{ display: 'block', marginBottom: '5px' }}>Descripción:</label>
                         <textarea
                             id="description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
+                            required
                             rows="4"
                             style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
                         ></textarea>
@@ -168,16 +183,16 @@ const UploadPodcast = () => {
                         />
                         {coverImage && <p style={{ fontSize: '0.9em', color: '#555' }}>Seleccionado: {coverImage.name}</p>}
                     </div>
-                    
-                    <button 
-                        type="submit" 
+
+                    <button
+                        type="submit"
                         disabled={loading}
-                        style={{ 
-                            padding: '10px 15px', 
-                            backgroundColor: '#007bff', 
-                            color: 'white', 
-                            border: 'none', 
-                            borderRadius: '5px', 
+                        style={{
+                            padding: '10px 15px',
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '5px',
                             cursor: loading ? 'not-allowed' : 'pointer',
                             fontSize: '16px'
                         }}
