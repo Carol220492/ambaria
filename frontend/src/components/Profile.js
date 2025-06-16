@@ -1,6 +1,9 @@
+// frontend/src/components/Profile.js
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Eliminamos 'Link'
-import axios from 'axios'; // Importa Axios
+import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
+// --- IMPORTAR ESTILOS COMUNES ---
+import { pageContainerStyle, contentBoxStyle, primaryButtonStyle, secondaryButtonStyle, dangerButtonStyle } from '../styles/commonStyles';
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
@@ -8,14 +11,12 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // ESTADO para los podcasts del usuario
   const [userPodcasts, setUserPodcasts] = useState([]);
   const [podcastLoading, setPodcastLoading] = useState(true);
   const [podcastError, setPodcastError] = useState(null);
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-  // useEffect para obtener los datos del perfil
   useEffect(() => {
     const token = localStorage.getItem('jwt_token');
 
@@ -60,7 +61,6 @@ const Profile = () => {
     fetchProfileData();
   }, [navigate, API_URL]);
 
-  // useEffect para obtener los podcasts del usuario
   useEffect(() => {
     const token = localStorage.getItem('jwt_token');
 
@@ -73,7 +73,7 @@ const Profile = () => {
     const fetchUserPodcasts = async () => {
       try {
         console.log(`DEBUG PROFILE: Obteniendo podcasts del usuario de: ${API_URL}/podcasts/my_podcasts`);
-        const response = await axios.get(`${API_URL}/podcasts/my_podcasts`, { // <--- ¡URL CORREGIDA AQUÍ!
+        const response = await axios.get(`${API_URL}/podcasts/my_podcasts`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -99,19 +99,17 @@ const Profile = () => {
       }
     };
 
-    // Solo intenta cargar los podcasts si los datos del usuario se han cargado (o si el token existe al menos)
     if (!loading && !error) {
         fetchUserPodcasts();
     }
   }, [loading, error, navigate, API_URL]);
 
-  // NUEVA FUNCIÓN: Manejar la eliminación de un podcast
   const handleDeletePodcast = async (podcastId) => {
     if (!window.confirm("¿Estás seguro de que quieres eliminar este podcast? Esta acción no se puede deshacer.")) {
-      return; // El usuario canceló la eliminación
+      return;
     }
 
-    setPodcastLoading(true); // Mostrar estado de carga mientras se elimina
+    setPodcastLoading(true);
     const token = localStorage.getItem('jwt_token');
 
     try {
@@ -124,7 +122,6 @@ const Profile = () => {
 
       if (response.status === 200) {
         alert(response.data.message);
-        // Actualizar la lista de podcasts en el estado para reflejar la eliminación
         setUserPodcasts(userPodcasts.filter(p => p.id !== podcastId));
       } else {
         alert(response.data.error || "Error al eliminar el podcast.");
@@ -141,25 +138,24 @@ const Profile = () => {
           alert("Error al conectar con el servidor o eliminar el podcast.");
       }
     } finally {
-      setPodcastLoading(false); // Quitar estado de carga
+      setPodcastLoading(false);
     }
   };
 
-  // NUEVA FUNCIÓN: Manejar la edición de un podcast
   const handleEditPodcast = (podcastId) => {
     navigate(`/edit-podcast/${podcastId}`);
   };
 
 
   if (loading) {
-    return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Cargando perfil...</div>;
+    return <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>Cargando perfil...</div>;
   }
 
   if (error) {
     return (
-      <div style={{ color: 'red', textAlign: 'center', marginTop: '50px' }}>
-        <p>Error: {error}</p>
-        <button onClick={() => navigate('/')} style={{ padding: '10px 20px', backgroundColor: '#cc00cc', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+      <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
+        <p>{error}</p>
+        <button onClick={() => navigate('/')} style={primaryButtonStyle}>
           Ir a Iniciar Sesión
         </button>
       </div>
@@ -167,14 +163,38 @@ const Profile = () => {
   }
 
   if (!userData) {
-      return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>No se encontraron datos de usuario.</div>;
+      return <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>No se encontraron datos de usuario.</div>;
   }
 
   return (
-    <div style={{ padding: '20px', backgroundColor: '#1a1a32', minHeight: '100vh', color: 'white', fontFamily: 'Arial, sans-serif' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: '#2a2a4a', padding: '30px', borderRadius: '10px', boxShadow: '0 0 15px rgba(0, 255, 255, 0.5)' }}>
+    // Aplicar estilo de contenedor de página común
+    <div style={pageContainerStyle}>
+      <div style={contentBoxStyle}> {/* Aplicar estilo de caja de contenido común */}
         <h1 style={{ color: '#00FFFF', marginBottom: '20px' }}>Mi Perfil</h1>
-        
+
+        <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
+            <button
+                onClick={() => navigate(-1)}
+                style={secondaryButtonStyle} // Aplicar estilo de botón secundario
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#777'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#555'}
+            >
+                &larr; Atrás
+            </button>
+            <Link
+                to="/home-podcasts"
+                style={{
+                    ...primaryButtonStyle, // Aplicar estilo de botón primario
+                    textDecoration: 'none',
+                    textAlign: 'center'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
+            >
+                🏠 Home
+            </Link>
+        </div>
+
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '30px', borderBottom: '1px solid #444', paddingBottom: '20px' }}>
           {userData.profile_picture && (
             <img src={userData.profile_picture} alt="Foto de Perfil" style={{ borderRadius: '50%', width: '120px', height: '120px', objectFit: 'cover', marginRight: '20px', border: '3px solid #cc00cc' }} />
@@ -197,63 +217,45 @@ const Profile = () => {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
             {userPodcasts.map((podcast) => (
-              <div key={podcast.id} style={{ 
-                backgroundColor: '#3a3a5a', 
-                borderRadius: '8px', 
-                padding: '15px', 
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', 
-                display: 'flex', 
-                flexDirection: 'column', 
+              <div key={podcast.id} style={{
+                backgroundColor: '#3a3a5a',
+                borderRadius: '8px',
+                padding: '15px',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+                display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
                 textAlign: 'center'
               }}>
                 {podcast.cover_image_url && (
-                  <img 
-                    src={podcast.cover_image_url} 
-                    alt={podcast.title} 
-                    style={{ 
-                      width: '100%', 
-                      height: '150px', 
-                      objectFit: 'cover', 
-                      borderRadius: '4px', 
-                      marginBottom: '10px' 
-                    }} 
+                  <img
+                    src={podcast.cover_image_url}
+                    alt={podcast.title}
+                    style={{
+                      width: '100%',
+                      height: '150px',
+                      objectFit: 'cover',
+                      borderRadius: '4px',
+                      marginBottom: '10px'
+                    }}
                   />
                 )}
                 <h3 style={{ color: '#00FFFF', fontSize: '1.2em', margin: '10px 0' }}>{podcast.title}</h3>
                 <p style={{ color: '#ccc', fontSize: '0.9em', margin: '0 0 10px 0' }}>Artista: {podcast.artist}</p>
                 <p style={{ color: '#aaa', fontSize: '0.8em', margin: '0 0 15px 0', maxHeight: '60px', overflow: 'hidden' }}>{podcast.description}</p>
-                
+
                 <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
-                    <button 
+                    <button
                         onClick={() => handleEditPodcast(podcast.id)}
-                        style={{ 
-                            padding: '8px 15px', 
-                            backgroundColor: '#007bff', 
-                            color: 'white', 
-                            border: 'none', 
-                            borderRadius: '5px', 
-                            cursor: 'pointer', 
-                            fontSize: '0.9em',
-                            transition: 'background-color 0.3s ease'
-                        }}
+                        style={primaryButtonStyle} // Aplicar estilo de botón primario
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
                     >
                         Editar
                     </button>
-                    <button 
-                        onClick={() => handleDeletePodcast(podcast.id)} 
-                        style={{ 
-                            padding: '8px 15px', 
-                            backgroundColor: '#dc3545', 
-                            color: 'white', 
-                            border: 'none', 
-                            borderRadius: '5px', 
-                            cursor: 'pointer', 
-                            fontSize: '0.9em',
-                            transition: 'background-color 0.3s ease'
-                        }}
+                    <button
+                        onClick={() => handleDeletePodcast(podcast.id)}
+                        style={dangerButtonStyle} // Aplicar estilo de botón de peligro
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c82333'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc3545'}
                     >

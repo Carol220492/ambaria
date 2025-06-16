@@ -1,63 +1,59 @@
+// frontend/src/components/HomePodcasts.js
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import useAudioPlayerStore from '../store/useAudioPlayerStore'; // ¡NUEVA IMPORTACIÓN DEL STORE!
+import NavBar from './NavBar';
+import audioPlayerStore from '../store/useAudioPlayerStore';
+// --- IMPORTAR ESTILOS COMUNES ---
+import { pageContainerStyle, contentBoxStyle, primaryButtonStyle } from '../styles/commonStyles';
 
 const HomePodcasts = () => {
   const [podcasts, setPodcasts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const currentPlayingPodcast = audioPlayerStore.getState().currentPodcast;
+  const isPlaying = audioPlayerStore.getState().isPlaying; // Obtener el estado de reproducción
   const navigate = useNavigate();
 
-  // Acceder a la función playPodcast del store de Zustand
-  const playPodcast = useAudioPlayerStore((state) => state.playPodcast);
-  const currentPodcast = useAudioPlayerStore((state) => state.currentPodcast); // Para resaltar el que se está reproduciendo
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const fetchPodcasts = async () => {
       const token = localStorage.getItem('jwt_token');
       if (!token) {
-        setError("No autenticado. Por favor, inicia sesión.");
+        setError('No autenticado. Por favor, inicia sesión.');
         setLoading(false);
-        navigate('/');
         return;
       }
 
+      console.log(`DEBUG HOME: Obteniendo podcasts de: ${API_URL}/podcasts`);
       try {
-        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-        console.log(`DEBUG HOME: Obteniendo podcasts de: ${API_URL}/podcasts`);
         const response = await axios.get(`${API_URL}/podcasts`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-
-        // Tu API devuelve un objeto con la clave 'podcasts'
-        setPodcasts(response.data.podcasts); 
+        setPodcasts(response.data.podcasts);
         setLoading(false);
       } catch (err) {
-        console.error("Error al obtener podcasts:", err);
-        if (axios.isAxiosError(err) && err.response) {
-          if (err.response.status === 401) {
-            localStorage.removeItem('jwt_token');
-            setError("Tu sesión ha expirado. Por favor, inicia sesión de nuevo.");
-            navigate('/');
-          } else {
-            setError(`Error al cargar los podcasts: ${err.response.statusText || err.message}`);
-          }
-        } else {
-          setError("No se pudo conectar con el servidor o cargar los podcasts.");
-        }
+        console.error('Error al obtener podcasts:', err);
+        setError('Error al cargar podcasts.');
         setLoading(false);
+        if (err.response && (err.response.status === 401 || err.response.status === 422)) {
+            localStorage.removeItem('jwt_token');
+            navigate('/', { replace: true });
+        }
       }
     };
 
     fetchPodcasts();
-  }, [navigate]);
+  }, [navigate, API_URL]);
 
   if (loading) {
     return (
-      <div style={{ padding: '20px', textAlign: 'center', color: 'white' }}>
+      // Aplicar estilo de contenedor de página común
+      <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>
+        <NavBar />
         <p>Cargando podcasts...</p>
       </div>
     );
@@ -65,102 +61,91 @@ const HomePodcasts = () => {
 
   if (error) {
     return (
-      <div style={{ padding: '20px', textAlign: 'center', color: 'red' }}>
-        <p>Error: {error}</p>
-        <button onClick={() => navigate('/')} style={{ marginTop: '10px', padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-          Volver al Login
-        </button>
+      // Aplicar estilo de contenedor de página común
+      <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
+        <NavBar />
+        <p>{error}</p>
+        <button onClick={() => navigate('/')} style={primaryButtonStyle}>Volver a Iniciar Sesión</button>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '20px', paddingTop: '80px', background: 'radial-gradient(circle, #0a0a2a, #000000)', minHeight: '100vh', color: 'white' }}>
-      <h1 style={{ color: '#00FFFF', textAlign: 'center', marginBottom: '30px' }}>Todos los Podcasts</h1>
-      
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-        gap: '30px',
-        maxWidth: '1200px',
-        margin: '0 auto',
-        paddingBottom: '80px' // Espacio para el reproductor global
-      }}>
-        {podcasts.length === 0 ? (
-          <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: 'rgba(255, 255, 255, 0.7)' }}>No hay podcasts disponibles. ¡Sé el primero en subir uno!</p>
-        ) : (
-          podcasts.map(podcast => (
+    // Aplicar estilo de contenedor de página común
+    <div style={pageContainerStyle}>
+      <NavBar />
+      {/* Aplicar estilo de caja de contenido común */}
+      <div style={{ ...contentBoxStyle, maxWidth: '1200px' }}> {/* Sobreescribe maxWidth si es necesario */}
+        <h1 style={{ color: '#00FFFF', marginBottom: '20px', textAlign: 'center' }}>Explorar Podcasts</h1>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '30px' }}>
+          {podcasts.map((podcast) => (
             <div
               key={podcast.id}
               style={{
-                background: 'rgba(26, 26, 64, 0.8)',
-                borderRadius: '10px',
+                backgroundColor: '#3a3a5a', // Estilo específico de la tarjeta
+                borderRadius: '12px',
                 padding: '20px',
-                boxShadow: `0 0 15px ${currentPodcast && currentPodcast.id === podcast.id ? 'rgba(0, 255, 255, 1)' : 'rgba(0, 255, 255, 0.5)'}`, // Resaltar si está reproduciendo
-                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.4)',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between',
-                height: '100%' // Asegura que las tarjetas tengan la misma altura si el contenido es variable
+                alignItems: 'center',
+                textAlign: 'center',
+                transition: 'transform 0.2s ease-in-out',
+                cursor: 'pointer'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.03)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
               {podcast.cover_image_url && (
                 <img
                   src={podcast.cover_image_url}
                   alt={podcast.title}
-                  style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '15px' }}
+                  style={{
+                    width: '100%',
+                    height: '200px',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    marginBottom: '15px',
+                    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)'
+                  }}
                 />
               )}
-              <h3 style={{ color: '#00FFFF', marginBottom: '10px', fontSize: '1.4em' }}>{podcast.title}</h3>
-              <p style={{ color: '#E6B3FF', fontSize: '1em', marginBottom: '5px' }}>**Artista:** {podcast.artist}</p>
-              <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.9em', flexGrow: 1 }}>
-                {podcast.description.substring(0, 100)}{podcast.description.length > 100 ? '...' : ''}
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '15px', gap: '10px' }}>
+              <h3 style={{ color: '#00FFFF', fontSize: '1.4em', margin: '10px 0' }}>{podcast.title}</h3>
+              <p style={{ color: '#ccc', fontSize: '1em', margin: '0 0 10px 0' }}>Artista: {podcast.artist}</p>
+              <p style={{ color: '#aaa', fontSize: '0.9em', margin: '0 0 15px 0', maxHeight: '80px', overflow: 'hidden' }}>{podcast.description}</p>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: 'auto', width: '100%', justifyContent: 'center' }}>
                 <button
-                  onClick={() => playPodcast(podcast)} // ¡AHORA HACE PLAY EN EL REPRODUCTOR GLOBAL!
+                  onClick={() => audioPlayerStore.getState().playPodcast(podcast)}
                   style={{
-                    flex: 1,
-                    padding: '10px 15px',
-                    backgroundColor: '#cc00cc', // Botón de reproducir
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    fontSize: '1em',
-                    fontWeight: 'bold',
-                    transition: 'background-color 0.3s ease'
+                    ...primaryButtonStyle, // Aplicar estilo de botón primario
+                    backgroundColor: (currentPlayingPodcast && currentPlayingPodcast.id === podcast.id && isPlaying) ? '#4CAF50' : '#cc00cc',
+                    flex: 1
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e600e6'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#cc00cc'}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = (currentPlayingPodcast && currentPlayingPodcast.id === podcast.id && isPlaying) ? '#45a049' : '#e600e6'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = (currentPlayingPodcast && currentPlayingPodcast.id === podcast.id && isPlaying) ? '#4CAF50' : '#cc00cc'}
                 >
-                  Reproducir
+                  {(currentPlayingPodcast && currentPlayingPodcast.id === podcast.id && isPlaying) ? 'Reproduciendo...' : 'Reproducir'}
                 </button>
-                <button
-                  onClick={() => navigate(`/podcast/${podcast.id}`)} // Mantiene la navegación a detalles
+                <Link
+                  to={`/podcast/${podcast.id}`}
                   style={{
-                    flex: 1,
-                    padding: '10px 15px',
-                    backgroundColor: '#007bff', // Botón de ver detalles
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    fontSize: '1em',
-                    fontWeight: 'bold',
-                    transition: 'background-color 0.3s ease'
+                    ...primaryButtonStyle, // Aplicar estilo de botón primario
+                    backgroundColor: '#007bff',
+                    textDecoration: 'none',
+                    textAlign: 'center',
+                    flex: 1
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
                 >
                   Ver Detalles
-                </button>
+                </Link>
               </div>
             </div>
-          ))
-        )}
+          ))}
+        </div>
       </div>
     </div>
   );

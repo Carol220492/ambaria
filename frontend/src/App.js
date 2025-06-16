@@ -10,8 +10,9 @@ import NavBar from './components/NavBar';
 import PodcastDetail from './components/PodcastDetail';
 import ContactForm from './components/ContactForm';
 import GlobalAudioPlayer from './components/GlobalAudioPlayer';
-import EditPodcast from './components/EditPodcast'; // <--- ¡Importación existente!
-import { AuthProvider } from './context/AuthContext'; // <--- ¡NUEVA IMPORTACIÓN: AuthProvider!
+import EditPodcast from './components/EditPodcast';
+import { AuthProvider } from './context/AuthContext';
+import VideoBackground from './components/VideoBackground'; // <--- ¡IMPORTACIÓN DEL NUEVO COMPONENTE!
 
 const PrivateRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('jwt_token');
@@ -21,9 +22,12 @@ const PrivateRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      {/* Envuelve toda la aplicación con AuthProvider para que el contexto de autenticación esté disponible */}
-      <AuthProvider> {/* <--- ¡INICIO DE AuthProvider! */}
-        <div className="App">
+      <AuthProvider>
+        {/* --- COLOCA EL VIDEOBACKGROUND AQUÍ, AL PRINCIPIO DEL CONTENEDOR PRINCIPAL --- */}
+        <VideoBackground /> {/* <--- ¡AÑADIDO AQUÍ! */}
+
+        {/* Asegura que el contenido de la aplicación esté por encima del video de fondo */}
+        <div className="App" style={{ position: 'relative', zIndex: 1 }}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/auth-callback" element={<AuthHandler />} />
@@ -77,7 +81,6 @@ function App() {
                 </PrivateRoute>
               }
             />
-            {/* Ruta para editar podcast */}
             <Route
               path="/edit-podcast/:id"
               element={
@@ -91,7 +94,7 @@ function App() {
 
           <GlobalAudioPlayer />
         </div>
-      </AuthProvider> {/* <--- ¡FIN DE AuthProvider! */}
+      </AuthProvider>
     </Router>
   );
 }

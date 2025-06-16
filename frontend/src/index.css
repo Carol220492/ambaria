@@ -9,7 +9,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden; /* Evitar scroll horizontal */
   
- background-image: url('./assets/background.jpg'); /* Ruta a tu imagen */
+ background-image: url('./assets/ambaria.mp4'); /* Ruta a tu imagen */
   background-size: cover; /* Cubre toda la pantalla sin distorsionar */
   background-position: center center; /* Centra la imagen */
   background-attachment: fixed; /* Mantiene la imagen fija al hacer scroll */

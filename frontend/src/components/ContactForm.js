@@ -1,146 +1,143 @@
+// frontend/src/components/ContactForm.js
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom'; // Importa Link
+import NavBar from './NavBar'; // Importa el NavBar
 
 const ContactForm = () => {
-  const [status, setStatus] = useState('');
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [submitMessage, setSubmitMessage] = useState(''); // Para mensajes de éxito/error
+    const navigate = useNavigate();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setStatus('sending'); // Establecer estado de envío
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setSubmitMessage(''); // Limpia mensajes anteriores
 
-    const form = event.target;
-    const data = new FormData(form);
+        try {
+            // Aquí simularías una llamada a tu API de backend si tuvieras una para contacto
+            // Por ahora, solo simularé una respuesta exitosa
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simula una petición de red
 
-    try {
-      const response = await fetch(form.action, {
-        method: form.method,
-        body: data,
-        headers: {
-            'Accept': 'application/json' // Importante para recibir una respuesta JSON de formsubmit
+            setSubmitMessage('¡Tu mensaje ha sido enviado con éxito! Nos pondremos en contacto contigo pronto.');
+            setName('');
+            setEmail('');
+            setMessage('');
+            navigate('/contact-success'); // Redirigir a la página de éxito
+        } catch (error) {
+            console.error('Error al enviar el mensaje de contacto:', error);
+            setSubmitMessage('Hubo un error al enviar tu mensaje. Por favor, inténtalo de nuevo.');
+        } finally {
+            setLoading(false);
         }
-      });
+    };
 
-      if (response.ok) {
-        setStatus('success');
-        form.reset(); // Limpia el formulario
-      } else {
-        setStatus('error');
-        const errorData = await response.json(); // Intentar leer el error
-        console.error('Error de FormSubmit:', errorData);
-      }
-    } catch (error) {
-      console.error('Error al enviar el formulario:', error);
-      setStatus('error');
-    }
-  };
+    return (
+        <div style={{ backgroundColor: '#1a1a32', minHeight: '100vh', color: 'white', fontFamily: 'Arial, sans-serif', padding: '20px' }}>
+            <NavBar /> {/* <--- ¡AÑADIDO NAVBAR! */}
+            <div style={{ maxWidth: '600px', margin: '20px auto', padding: '30px', backgroundColor: '#2a2a4a', borderRadius: '10px', boxShadow: '0 0 15px rgba(0, 255, 255, 0.5)' }}>
+                <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#00FFFF' }}>Contáctanos</h2>
 
-  return (
-    <div style={{
-        padding: '20px',
-        maxWidth: '500px',
-        margin: '50px auto',
-        background: 'rgba(26, 26, 64, 0.9)',
-        borderRadius: '10px',
-        boxShadow: '0 0 15px rgba(0, 255, 255, 0.5)',
-        color: 'white',
-        textAlign: 'center'
-    }}>
-      <h2 style={{ color: '#00FFFF', marginBottom: '25px' }}>Contacto</h2>
-      <p style={{ color: 'rgba(255, 255, 255, 0.8)', marginBottom: '20px' }}>
-        Si tienes alguna pregunta o sugerencia, no dudes en contactarnos.
-      </p>
+                {/* --- NUEVOS BOTONES DE NAVEGACIÓN --- */}
+                <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
+                    <button
+                        onClick={() => navigate(-1)}
+                        style={{
+                            padding: '8px 15px',
+                            backgroundColor: '#555',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                            fontSize: '0.9em',
+                            transition: 'background-color 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#777'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#555'}
+                    >
+                        &larr; Atrás
+                    </button>
+                    <Link
+                        to="/home-podcasts"
+                        style={{
+                            padding: '8px 15px',
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                            fontSize: '0.9em',
+                            textDecoration: 'none',
+                            transition: 'background-color 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
+                    >
+                        🏠 Home
+                    </Link>
+                </div>
+                {/* --- FIN NUEVOS BOTONES DE NAVEGACIÓN --- */}
 
-      {/* ¡IMPORTANTE!: Reemplaza 'tuemail@tudominio.com' con tu dirección de correo electrónico real.
-        FormSubmit.co enviará los correos a esta dirección.
-        También puedes ir a https://formsubmit.co/ para generar tu endpoint.
-      */}
-      <form
-        action="https://formsubmit.co/analancommty2021@gmail.com"
-        method="POST"
-        onSubmit={handleSubmit}
-        style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}
-      >
-        <input
-          type="text"
-          name="name"
-          placeholder="Tu Nombre"
-          required
-          style={{
-            padding: '12px',
-            borderRadius: '5px',
-            border: '1px solid #00FFFF',
-            background: 'rgba(0, 0, 0, 0.3)',
-            color: 'white',
-            fontSize: '1em'
-          }}
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Tu Email"
-          required
-          style={{
-            padding: '12px',
-            borderRadius: '5px',
-            border: '1px solid #00FFFF',
-            background: 'rgba(0, 0, 0, 0.3)',
-            color: 'white',
-            fontSize: '1em'
-          }}
-        />
-        <textarea
-          name="message"
-          placeholder="Tu Mensaje"
-          required
-          rows="5"
-          style={{
-            padding: '12px',
-            borderRadius: '5px',
-            border: '1px solid #00FFFF',
-            background: 'rgba(0, 0, 0, 0.3)',
-            color: 'white',
-            fontSize: '1em',
-            resize: 'vertical'
-          }}
-        ></textarea>
-
-        {/* Este input oculto es para que FormSubmit.co redirija al usuario a una página de éxito. */}
-        <input type="hidden" name="_next" value="http://localhost:3000/contact-success" />
-        {/* Este input oculto es para deshabilitar la página de 'reCAPTCHA' de FormSubmit (opcional, por simplicidad) */}
-        <input type="hidden" name="_captcha" value="false" />
-
-
-        <button
-          type="submit"
-          disabled={status === 'sending'}
-          style={{
-            padding: '12px 25px',
-            backgroundColor: '#cc00cc',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            fontSize: '1.1em',
-            fontWeight: 'bold',
-            transition: 'background-color 0.3s ease',
-            opacity: status === 'sending' ? 0.7 : 1
-          }}
-        >
-          {status === 'sending' ? 'Enviando...' : 'Enviar Mensaje'}
-        </button>
-      </form>
-
-      {status === 'success' && (
-        <p style={{ color: '#8AFFD2', marginTop: '20px', fontWeight: 'bold' }}>
-          ¡Mensaje enviado con éxito! Nos pondremos en contacto contigo pronto.
-        </p>
-      )}
-      {status === 'error' && (
-        <p style={{ color: 'red', marginTop: '20px', fontWeight: 'bold' }}>
-          Error al enviar el mensaje. Por favor, inténtalo de nuevo.
-        </p>
-      )}
-    </div>
-  );
+                {submitMessage && (
+                    <p style={{ textAlign: 'center', color: submitMessage.includes('éxito') ? 'lightgreen' : 'red', marginBottom: '15px' }}>
+                        {submitMessage}
+                    </p>
+                )}
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <div>
+                        <label htmlFor="name" style={{ display: 'block', marginBottom: '5px' }}>Nombre:</label>
+                        <input
+                            type="text"
+                            id="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="email" style={{ display: 'block', marginBottom: '5px' }}>Correo Electrónico:</label>
+                        <input
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="message" style={{ display: 'block', marginBottom: '5px' }}>Mensaje:</label>
+                        <textarea
+                            id="message"
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
+                            rows="5"
+                            required
+                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                        ></textarea>
+                    </div>
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        style={{
+                            padding: '10px 15px',
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: loading ? 'not-allowed' : 'pointer',
+                            fontSize: '16px'
+                        }}
+                    >
+                        {loading ? 'Enviando...' : 'Enviar Mensaje'}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
 };
 
 export default ContactForm;

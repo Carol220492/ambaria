@@ -1,22 +1,21 @@
-// frontend/src/components/PodcastDetail.js
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom'; // Importa Link
 import axios from 'axios';
 import NavBar from './NavBar';
-import useAudioPlayerStore from '../store/useAudioPlayerStore';
-import { AuthContext } from '../context/AuthContext'; // Asegúrate de tener tu AuthContext
+import audioPlayerStore from '../store/useAudioPlayerStore'; // Importa la instancia del store
+import { AuthContext } from '../context/AuthContext';
 
 const PodcastDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext); // Obtener el usuario autenticado del contexto
+  const { user } = useContext(AuthContext);
   const [podcast, setPodcast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const playPodcast = useAudioPlayerStore((state) => state.playPodcast);
-  const [comments, setComments] = useState([]); // Estado para los comentarios
-  const [newCommentText, setNewCommentText] = useState(''); // Estado para el texto del nuevo comentario
-  const [commentLoading, setCommentLoading] = useState(false); // Estado para la carga de comentarios
+  // No necesitas destructuring aquí, accedes directamente a audioPlayerStore.getState().action()
+  const [comments, setComments] = useState([]);
+  const [newCommentText, setNewCommentText] = useState('');
+  const [commentLoading, setCommentLoading] = useState(false);
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -30,68 +29,62 @@ const PodcastDetail = () => {
         return;
       }
 
-      console.log(`DEBUG PODCAST DETAIL: Obteniendo detalles del podcast ${id} de: ${API_URL}/podcasts/${id}`); // Debug
+      console.log(`DEBUG PODCAST DETAIL: Obteniendo detalles del podcast ${id} de: ${API_URL}/podcasts/${id}`);
       try {
         const response = await axios.get(`${API_URL}/podcasts/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        // --- ¡CORRECCIÓN AQUÍ! ---
-        // El backend devuelve el podcast directamente en response.data, no en response.data.podcast
-        console.log("DEBUG PODCAST DETAIL: Detalles recibidos:", response.data); // Debug
-        setPodcast(response.data); // <-- CAMBIO DE response.data.podcast a response.data
+        console.log("DEBUG PODCAST DETAIL: Detalles recibidos:", response.data);
+        setPodcast(response.data);
         setLoading(false);
       } catch (err) {
-        console.error('Error al obtener detalles del podcast:', err.response?.data || err.message); // Debug
+        console.error('Error al obtener detalles del podcast:', err.response?.data || err.message);
         setError('Error al cargar los detalles del podcast.');
         setLoading(false);
       }
     };
 
     fetchPodcastDetails();
-  }, [id, navigate, API_URL]); // Dependencias: id del podcast, navigate, API_URL
+  }, [id, navigate, API_URL]);
 
-  // --- NUEVO useEffect para cargar los comentarios ---
   useEffect(() => {
     const fetchComments = async () => {
       const token = localStorage.getItem('jwt_token');
       if (!token) {
-        // No mostramos error si solo faltan comentarios por falta de autenticación
         console.log("DEBUG PODCAST DETAIL: No hay token para cargar comentarios.");
         return;
       }
 
-      console.log(`DEBUG PODCAST DETAIL: Obteniendo comentarios para podcast ${id} de: ${API_URL}/api/podcasts/${id}/comments`); // Debug
+      console.log(`DEBUG PODCAST DETAIL: Obteniendo comentarios para podcast ${id} de: ${API_URL}/api/podcasts/${id}/comments`);
       try {
-        const response = await axios.get(`${API_URL}/api/podcasts/${id}/comments`, { // <-- Ruta de comentarios con /api/
+        const response = await axios.get(`${API_URL}/api/podcasts/${id}/comments`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        console.log("DEBUG PODCAST DETAIL: Comentarios recibidos:", response.data.comments); // Debug
+        console.log("DEBUG PODCAST DETAIL: Comentarios recibidos:", response.data.comments);
         setComments(response.data.comments);
       } catch (err) {
-        console.error('Error al obtener comentarios:', err.response?.data || err.message); // Debug
-        // Solo establece error si no es un 404 esperado (por ejemplo, si no hay comentarios aún)
+        console.error('Error al obtener comentarios:', err.response?.data || err.message);
         if (err.response && err.response.status !== 404) {
           setError('Error al cargar los comentarios.');
-        } else if (!err.response) { // Problema de red, etc.
+        } else if (!err.response) {
           setError('No se pudo conectar para cargar comentarios.');
         }
       }
     };
 
-    if (podcast) { // Solo cargamos comentarios si el podcast ya se ha cargado
+    if (podcast) {
       fetchComments();
     }
-  }, [id, podcast, API_URL]); // Dependencias: id del podcast, el objeto podcast, API_URL
+  }, [id, podcast, API_URL]);
 
-  // --- Función para enviar un nuevo comentario ---
   const handleAddComment = async (e) => {
     e.preventDefault();
     setCommentLoading(true);
-    setError(null); // Limpiar errores previos
+    setError(null);
 
     const token = localStorage.getItem('jwt_token');
     if (!token) {
@@ -106,7 +99,7 @@ const PodcastDetail = () => {
       return;
     }
 
-    console.log(`DEBUG PODCAST DETAIL: Enviando comentario para podcast ${id} a: ${API_URL}/api/podcasts/${id}/comments`); // Debug
+    console.log(`DEBUG PODCAST DETAIL: Enviando comentario para podcast ${id} a: ${API_URL}/api/podcasts/${id}/comments`);
     try {
       const response = await axios.post(`${API_URL}/api/podcasts/${id}/comments`, {
         text: newCommentText
@@ -116,19 +109,17 @@ const PodcastDetail = () => {
           'Content-Type': 'application/json'
         }
       });
-      console.log("DEBUG PODCAST DETAIL: Comentario publicado:", response.data.comment); // Debug
-      // Añadir el nuevo comentario al estado, al principio de la lista para que aparezca primero
+      console.log("DEBUG PODCAST DETAIL: Comentario publicado:", response.data.comment);
       setComments([response.data.comment, ...comments]);
-      setNewCommentText(''); // Limpiar el campo de texto
+      setNewCommentText('');
       setCommentLoading(false);
     } catch (err) {
-      console.error('Error al añadir comentario:', err.response?.data || err.message); // Debug
+      console.error('Error al añadir comentario:', err.response?.data || err.message);
       setError(`Error al publicar el comentario: ${err.response?.data?.error || 'Desconocido'}`);
       setCommentLoading(false);
     }
   };
 
-  // --- Función para eliminar un comentario (opcional) ---
   const handleDeleteComment = async (commentId) => {
     const token = localStorage.getItem('jwt_token');
     if (!token) {
@@ -137,19 +128,18 @@ const PodcastDetail = () => {
     }
 
     if (window.confirm('¿Estás seguro de que quieres eliminar este comentario? Esta acción no se puede deshacer.')) {
-      console.log(`DEBUG PODCAST DETAIL: Eliminando comentario con ID: ${commentId} de: ${API_URL}/api/comments/${commentId}`); // Debug
+      console.log(`DEBUG PODCAST DETAIL: Eliminando comentario con ID: ${commentId} de: ${API_URL}/api/comments/${commentId}`);
       try {
         await axios.delete(`${API_URL}/api/comments/${commentId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        console.log("DEBUG PODCAST DETAIL: Comentario eliminado:", commentId); // Debug
-        // Filtrar el comentario eliminado del estado
+        console.log("DEBUG PODCAST DETAIL: Comentario eliminado:", commentId);
         setComments(comments.filter(comment => comment.id !== commentId));
         alert('Comentario eliminado con éxito.');
       } catch (err) {
-        console.error('Error al eliminar comentario:', err.response?.data || err.message); // Debug
+        console.error('Error al eliminar comentario:', err.response?.data || err.message);
         alert(`Error al eliminar comentario: ${err.response?.data?.error || 'Error desconocido'}`);
       }
     }
@@ -165,8 +155,7 @@ const PodcastDetail = () => {
     );
   }
 
-  // Se muestra un mensaje de error genérico si hay un error en la carga inicial del podcast
-  if (error && !podcast) { // Solo mostrar este error si el podcast no se ha cargado en absoluto
+  if (error && !podcast) {
     return (
       <div style={{ color: 'red', textAlign: 'center', marginTop: '50px' }}>
         <NavBar />
@@ -176,7 +165,6 @@ const PodcastDetail = () => {
     );
   }
 
-  // Si el podcast es null (no encontrado o error grave que no permite renderizar)
   if (!podcast) {
     return (
       <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>
@@ -189,7 +177,7 @@ const PodcastDetail = () => {
 
   return (
     <div style={{
-      backgroundColor: '#282c34',
+      backgroundColor: '#282c34', // Fondo específico para esta página
       minHeight: '100vh',
       color: 'white',
       padding: '20px',
@@ -208,9 +196,49 @@ const PodcastDetail = () => {
         flexDirection: 'column',
         alignItems: 'center'
       }}>
-        {podcast.cover_image_url && ( // Usa podcast.cover_image_url directamente del objeto de podcast
+        {/* --- NUEVOS BOTONES DE NAVEGACIÓN --- */}
+        <div style={{ alignSelf: 'flex-start', marginBottom: '20px', display: 'flex', gap: '10px' }}>
+            <button
+                onClick={() => navigate(-1)}
+                style={{
+                    padding: '8px 15px',
+                    backgroundColor: '#555',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '0.9em',
+                    transition: 'background-color 0.3s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#777'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#555'}
+            >
+                &larr; Atrás
+            </button>
+            <Link
+                to="/home-podcasts"
+                style={{
+                    padding: '8px 15px',
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '0.9em',
+                    textDecoration: 'none',
+                    transition: 'background-color 0.3s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
+            >
+                🏠 Home
+            </Link>
+        </div>
+        {/* --- FIN NUEVOS BOTONES DE NAVEGACIÓN --- */}
+
+        {podcast.cover_image_url && (
           <img
-            src={podcast.cover_image_url} // Ya viene como URL completa del backend
+            src={podcast.cover_image_url}
             alt={podcast.title}
             style={{
               width: '100%',
@@ -223,11 +251,15 @@ const PodcastDetail = () => {
           />
         )}
         <h1 style={{ color: '#8AFFD2', marginBottom: '10px', textAlign: 'center' }}>{podcast.title}</h1>
-        {podcast.artist && <p style={{ color: '#bbb', fontSize: '1.1em', marginBottom: '15px' }}>Subido por: {podcast.artist}</p>}
+        {/* Aquí usas podcast.artist, asegúrate que tu backend lo devuelva.
+            Si el artista es el nombre del usuario, podrías usar: {podcast.user.name}
+            Ajusta según lo que tu backend realmente envíe para 'artist'.
+        */}
+        {podcast.artist && <p style={{ color: '#bbb', fontSize: '1.1em', marginBottom: '15px' }}>Artista: {podcast.artist}</p>}
         <p style={{ lineHeight: '1.6', textAlign: 'center', marginBottom: '20px' }}>{podcast.description}</p>
 
         <button
-          onClick={() => playPodcast(podcast)}
+          onClick={() => audioPlayerStore.getState().playPodcast(podcast)} // Llamada directa a la acción del store
           style={{
             padding: '12px 25px',
             backgroundColor: '#cc00cc',
@@ -337,7 +369,7 @@ const PodcastDetail = () => {
                     <p style={{ margin: 0, lineHeight: '1.4' }}>{comment.text}</p>
                   </div>
                   {/* Botón de eliminar (solo si el usuario actual es el autor del comentario) */}
-                  {user && String(user.user_id) === String(comment.user_id) && ( // Comparar como string para seguridad
+                  {user && String(user.user_id) === String(comment.user_id) && (
                     <button
                       onClick={() => handleDeleteComment(comment.id)}
                       style={{
@@ -354,7 +386,7 @@ const PodcastDetail = () => {
                       }}
                       title="Eliminar comentario"
                     >
-                      &#x2715; {/* X character */}
+                      &#x2715;
                     </button>
                   )}
                 </div>

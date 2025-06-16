@@ -1,15 +1,15 @@
 // frontend/src/components/EditPodcast.js
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom'; // Importa Link
 import axios from 'axios';
 import NavBar from './NavBar';
 
 const EditPodcast = () => {
-    const { id } = useParams(); // Obtiene el ID del podcast de la URL
+    const { id } = useParams();
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [category, setCategory] = useState(''); // Usa 'category' para coincidir con el backend
+    const [category, setCategory] = useState('');
     const [audioFile, setAudioFile] = useState(null);
     const [coverImage, setCoverImage] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -30,18 +30,15 @@ const EditPodcast = () => {
             }
 
             try {
-                // Obtener los detalles del podcast
                 const response = await axios.get(`${API_URL}/podcasts/${id}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                const podcast = response.data;
+                const podcast = response.data; // Asumiendo que el backend devuelve el podcast directamente
                 setTitle(podcast.title);
                 setDescription(podcast.description);
-                setCategory(podcast.category); // 'category' en el backend
-                // No cargamos los archivos de audio/imagen directamente, solo sus URLs para referencia
-                // El usuario subirá nuevos si quiere cambiarlos
+                setCategory(podcast.category);
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching podcast for edit:', err);
@@ -77,11 +74,9 @@ const EditPodcast = () => {
         }
 
         const formData = new FormData();
-        // Solo añade campos si han sido modificados o si quieres que siempre se envíen
-        // Para PUT, es común enviar todos los campos actuales.
         if (title) formData.append('title', title);
         if (description) formData.append('description', description);
-        if (category) formData.append('category', category); // Usa 'category'
+        if (category) formData.append('category', category);
         if (audioFile) formData.append('audio_file', audioFile);
         if (coverImage) formData.append('cover_image', coverImage);
 
@@ -89,14 +84,12 @@ const EditPodcast = () => {
             const response = await axios.put(`${API_URL}/podcasts/${id}`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    // 'Content-Type': 'multipart/form-data' es manejado por axios/fetch
                 },
             });
 
             if (response.status === 200) {
                 setMessage('Podcast actualizado con éxito!');
-                // Opcional: Redirigir al perfil o a la página de detalles del podcast
-                navigate('/profile');
+                navigate('/profile'); // Redirigir al perfil después de editar
             } else {
                 setError(response.data.error || 'Error al actualizar el podcast.');
             }
@@ -121,6 +114,47 @@ const EditPodcast = () => {
             <NavBar />
             <div style={{ padding: '20px', maxWidth: '600px', margin: '20px auto', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '2px 2px 8px rgba(0,0,0,0.1)', backgroundColor: '#2a2a4a', color: 'white' }}>
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#00FFFF' }}>Editar Podcast</h2>
+
+                {/* --- NUEVOS BOTONES DE NAVEGACIÓN --- */}
+                <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
+                    <button
+                        onClick={() => navigate(-1)}
+                        style={{
+                            padding: '8px 15px',
+                            backgroundColor: '#555',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                            fontSize: '0.9em',
+                            transition: 'background-color 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#777'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#555'}
+                    >
+                        &larr; Atrás
+                    </button>
+                    <Link
+                        to="/home-podcasts"
+                        style={{
+                            padding: '8px 15px',
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                            fontSize: '0.9em',
+                            textDecoration: 'none',
+                            transition: 'background-color 0.3s ease'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
+                    >
+                        🏠 Home
+                    </Link>
+                </div>
+                {/* --- FIN NUEVOS BOTONES DE NAVEGACIÓN --- */}
+
                 {message && <p style={{ color: 'lightgreen', textAlign: 'center' }}>{message}</p>}
                 {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
