@@ -85,6 +85,11 @@ def create_podcast():
     if 'cover_image' in request.files and request.files['cover_image'].filename != '':
         cover_image_file = request.files['cover_image']
         if allowed_file(cover_image_file.filename, ALLOWED_IMAGE_EXTENSIONS):
+            # Si el podcast tiene una imagen de portada antigua, eliminarla antes de guardar la nueva
+            # (aunque aquí se está creando uno nuevo, es una buena práctica si esto se reutiliza)
+            # if new_podcast.cover_image_path and os.path.exists(new_podcast.cover_image_path):
+            #     os.remove(new_podcast.cover_image_path)
+
             cover_image_filename = secure_filename(cover_image_file.filename)
             cover_image_file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], cover_image_filename))
             cover_image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], cover_image_filename)
@@ -124,12 +129,19 @@ def create_podcast():
 
 
 # --- RUTA PARA OBTENER TODOS LOS PODCASTS (GET) ---
-# CAMBIO 3: Añadir '/podcasts' a la ruta GET ALL
+# CAMBIO: Ahora puede aceptar un filtro por categoría
 @podcast_bp.route('/podcasts', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_all_podcasts():
     try:
-        podcasts = Podcast.query.all()
+        category_filter = request.args.get('category') # Obtener el parámetro de categoría de la URL
+        
+        query = Podcast.query
+        if category_filter and category_filter != 'All': # Si hay un filtro y no es 'All'
+            query = query.filter_by(category=category_filter)
+
+        podcasts = query.all() # Ejecutar la consulta
+        
         podcasts_data = []
         for podcast in podcasts:
             artist_name = podcast.user.name if podcast.user else "Desconocido"
@@ -155,8 +167,7 @@ def get_all_podcasts():
 
 
 # --- RUTA PARA OBTENER UN SOLO PODCAST POR ID (GET) ---
-# CAMBIO 4: Añadir '/podcasts' a la ruta GET single
-@podcast_bp.route('/podcasts/<int:podcast_id>', methods=['GET'], strict_slashes=False) # Añadido /podcasts y strict_slashes=False
+@podcast_bp.route('/podcasts/<int:podcast_id>', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_podcast(podcast_id):
     try:
@@ -174,7 +185,7 @@ def get_podcast(podcast_id):
             'title': podcast.title,
             'description': podcast.description,
             'artist': artist_name,
-            'category': podcast.category, # Cambiado 'genre' a 'category' para coherencia
+            'category': podcast.category,
             'audio_url': audio_url,
             'cover_image_url': cover_image_url,
             'created_at': podcast.created_at.isoformat(),
@@ -185,8 +196,7 @@ def get_podcast(podcast_id):
 
 
 # --- RUTA PARA OBTENER LOS PODCASTS DEL USUARIO ACTUAL (GET) ---
-# CAMBIO 5: Añadir '/podcasts' a la ruta de user podcasts
-@podcast_bp.route('/podcasts/my_podcasts', methods=['GET'], strict_slashes=False) # Añadido /podcasts y strict_slashes=False
+@podcast_bp.route('/podcasts/my_podcasts', methods=['GET'], strict_slashes=False)
 @jwt_required()
 def get_my_podcasts():
     current_user_id = get_jwt_identity()
@@ -206,7 +216,7 @@ def get_my_podcasts():
                 'title': podcast.title,
                 'description': podcast.description,
                 'artist': artist_name,
-                'category': podcast.category, # Cambiado 'genre' a 'category' para coherencia
+                'category': podcast.category,
                 'audio_url': audio_url,
                 'cover_image_url': cover_image_url,
                 'created_at': podcast.created_at.isoformat(),
@@ -226,7 +236,6 @@ def delete_podcast(podcast_id):
         return jsonify({"error": "No autenticado."}), 401
 
     try:
-        # Asegúrate de que el user_id del token sea un entero para la comparación
         user_id_int = int(current_user_id)
     except ValueError:
         return jsonify({"error": "ID de usuario inválido en el token."}), 400
@@ -236,11 +245,9 @@ def delete_podcast(podcast_id):
         if not podcast:
             return jsonify({"error": "Podcast no encontrado."}), 404
 
-        # ¡Verificar que el usuario autenticado es el propietario del podcast!
         if podcast.user_id != user_id_int:
-            return jsonify({"error": "No tienes permiso para eliminar este podcast."}), 403 # Forbidden
+            return jsonify({"error": "No tienes permiso para eliminar este podcast."}), 403
 
-        # Eliminar archivos del sistema de archivos
         if podcast.audio_path and os.path.exists(podcast.audio_path):
             os.remove(podcast.audio_path)
             print(f"DEBUG: Archivo de audio eliminado: {podcast.audio_path}")
@@ -248,7 +255,6 @@ def delete_podcast(podcast_id):
             os.remove(podcast.cover_image_path)
             print(f"DEBUG: Archivo de portada eliminado: {podcast.cover_image_path}")
 
-        # Eliminar el podcast de la base de datos
         db.session.delete(podcast)
         db.session.commit()
 
@@ -284,32 +290,24 @@ def update_podcast(podcast_id):
             return jsonify({"error": "Podcast no encontrado."}), 404
 
         if podcast.user_id != user_id_int:
-            return jsonify({"error": "No tienes permiso para editar este podcast."}), 403 # Forbidden
+            return jsonify({"error": "No tienes permiso para editar este podcast."}), 403
 
-        # Obtener datos del formulario
         title = request.form.get('title')
         description = request.form.get('description')
-        # artist = request.form.get('artist') # Ya no es necesario
         category = request.form.get('category')
 
-        # Actualizar campos si se proporcionan
         if title:
             podcast.title = title
         if description:
             podcast.description = description
-        # if artist: # Ya no es necesario
-        #    podcast.artist = artist
         if category:
             podcast.category = category
 
-        # Manejar la actualización de archivos de audio y/o imagen de portada
         if 'audio_file' in request.files and request.files['audio_file'].filename != '':
             new_audio_file = request.files['audio_file']
             if allowed_file(new_audio_file.filename, ALLOWED_EXTENSIONS):
-                # Eliminar archivo antiguo
                 if podcast.audio_path and os.path.exists(podcast.audio_path):
                     os.remove(podcast.audio_path)
-                # Guardar nuevo archivo
                 audio_filename = secure_filename(new_audio_file.filename)
                 new_audio_file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], audio_filename))
                 podcast.audio_path = os.path.join(current_app.config['UPLOAD_FOLDER'], audio_filename)
@@ -319,10 +317,8 @@ def update_podcast(podcast_id):
         if 'cover_image' in request.files and request.files['cover_image'].filename != '':
             new_cover_image_file = request.files['cover_image']
             if allowed_file(new_cover_image_file.filename, ALLOWED_IMAGE_EXTENSIONS):
-                # Eliminar imagen antigua
                 if podcast.cover_image_path and os.path.exists(podcast.cover_image_path):
                     os.remove(podcast.cover_image_path)
-                # Guardar nueva imagen
                 cover_image_filename = secure_filename(new_cover_image_file.filename)
                 new_cover_image_file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], cover_image_filename))
                 podcast.cover_image_path = os.path.join(current_app.config['UPLOAD_FOLDER'], cover_image_filename)
@@ -337,3 +333,25 @@ def update_podcast(podcast_id):
         return jsonify({"error": "Error al actualizar el podcast: " + str(e)}), 500
     except Exception as e:
         return jsonify({"error": "Error inesperado al actualizar el podcast: " + str(e)}), 500
+
+# --- NUEVA RUTA: Obtener categorías únicas ---
+@podcast_bp.route('/categories', methods=['GET'])
+@jwt_required()
+def get_podcast_categories():
+    try:
+        # Aquí asumo que estás usando SQLAlchemy con la base de datos que ya tienes.
+        # Si usaras MongoDB, la consulta sería diferente (ej. current_app.mongo.db.podcasts.distinct('category')).
+        
+        # Obtener todas las categorías únicas de la columna 'category'
+        categories = db.session.query(Podcast.category).distinct().all()
+        
+        # Extraer los valores de las tuplas y limpiar/ordenar
+        categories_list = sorted([cat[0] for cat in categories if cat[0]]) # Elimina None y ordena
+        
+        return jsonify({'categories': categories_list}), 200
+    except SQLAlchemyError as e:
+        current_app.logger.error(f"Error al obtener categorías de podcasts de la BD: {e}")
+        return jsonify({'error': 'Error interno del servidor al obtener categorías'}), 500
+    except Exception as e:
+        current_app.logger.error(f"Error inesperado al obtener categorías de podcasts: {e}")
+        return jsonify({'error': 'Error inesperado al obtener categorías'}), 500
