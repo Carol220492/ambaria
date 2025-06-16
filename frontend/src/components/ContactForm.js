@@ -1,31 +1,31 @@
 // frontend/src/components/ContactForm.js
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Importa Link
-import NavBar from './NavBar'; // Importa el NavBar
+import { useNavigate, Link } from 'react-router-dom';
+import NavBar from './NavBar';
+// IMPORTAR ESTILOS COMUNES
+import { pageContainerStyle, contentBoxStyle, formInputStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles';
 
 const ContactForm = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
-    const [submitMessage, setSubmitMessage] = useState(''); // Para mensajes de éxito/error
+    const [submitMessage, setSubmitMessage] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setSubmitMessage(''); // Limpia mensajes anteriores
+        setSubmitMessage('');
 
         try {
-            // Aquí simularías una llamada a tu API de backend si tuvieras una para contacto
-            // Por ahora, solo simularé una respuesta exitosa
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Simula una petición de red
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
             setSubmitMessage('¡Tu mensaje ha sido enviado con éxito! Nos pondremos en contacto contigo pronto.');
             setName('');
             setEmail('');
             setMessage('');
-            navigate('/contact-success'); // Redirigir a la página de éxito
+            navigate('/contact-success');
         } catch (error) {
             console.error('Error al enviar el mensaje de contacto:', error);
             setSubmitMessage('Hubo un error al enviar tu mensaje. Por favor, inténtalo de nuevo.');
@@ -35,25 +35,18 @@ const ContactForm = () => {
     };
 
     return (
-        <div style={{ backgroundColor: '#1a1a32', minHeight: '100vh', color: 'white', fontFamily: 'Arial, sans-serif', padding: '20px' }}>
-            <NavBar /> {/* <--- ¡AÑADIDO NAVBAR! */}
-            <div style={{ maxWidth: '600px', margin: '20px auto', padding: '30px', backgroundColor: '#2a2a4a', borderRadius: '10px', boxShadow: '0 0 15px rgba(0, 255, 255, 0.5)' }}>
+        // APLICAR: pageContainerStyle al div más externo para un fondo transparente
+        <div style={pageContainerStyle}>
+            <NavBar />
+            {/* APLICAR: contentBoxStyle al div que contiene el formulario de contacto */}
+            <div style={contentBoxStyle}>
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#00FFFF' }}>Contáctanos</h2>
 
-                {/* --- NUEVOS BOTONES DE NAVEGACIÓN --- */}
+                {/* Botones de navegación usando estilos comunes */}
                 <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
                     <button
                         onClick={() => navigate(-1)}
-                        style={{
-                            padding: '8px 15px',
-                            backgroundColor: '#555',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                            fontSize: '0.9em',
-                            transition: 'background-color 0.3s ease'
-                        }}
+                        style={secondaryButtonStyle} // APLICAR: secondaryButtonStyle
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#777'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#555'}
                     >
@@ -62,15 +55,9 @@ const ContactForm = () => {
                     <Link
                         to="/home-podcasts"
                         style={{
-                            padding: '8px 15px',
-                            backgroundColor: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                            fontSize: '0.9em',
+                            ...primaryButtonStyle, // APLICAR: primaryButtonStyle
                             textDecoration: 'none',
-                            transition: 'background-color 0.3s ease'
+                            textAlign: 'center'
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
@@ -78,7 +65,6 @@ const ContactForm = () => {
                         🏠 Home
                     </Link>
                 </div>
-                {/* --- FIN NUEVOS BOTONES DE NAVEGACIÓN --- */}
 
                 {submitMessage && (
                     <p style={{ textAlign: 'center', color: submitMessage.includes('éxito') ? 'lightgreen' : 'red', marginBottom: '15px' }}>
@@ -94,7 +80,7 @@ const ContactForm = () => {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle} // APLICAR: formInputStyle
                         />
                     </div>
                     <div>
@@ -105,7 +91,7 @@ const ContactForm = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle} // APLICAR: formInputStyle
                         />
                     </div>
                     <div>
@@ -116,21 +102,13 @@ const ContactForm = () => {
                             onChange={(e) => setMessage(e.target.value)}
                             rows="5"
                             required
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle} // APLICAR: formInputStyle
                         ></textarea>
                     </div>
                     <button
                         type="submit"
                         disabled={loading}
-                        style={{
-                            padding: '10px 15px',
-                            backgroundColor: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                            fontSize: '16px'
-                        }}
+                        style={primaryButtonStyle} // APLICAR: primaryButtonStyle
                     >
                         {loading ? 'Enviando...' : 'Enviar Mensaje'}
                     </button>

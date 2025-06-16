@@ -1,17 +1,24 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+// Importar estilos comunes para los botones
+import { primaryButtonStyle, dangerButtonStyle } from '../styles/commonStyles'; 
 
 const NavBar = () => {
   const navigate = useNavigate();
+  // Se asume que AuthContext está disponible y tiene 'logout', 'user', 'isAuthenticated'
+  const { user, isAuthenticated, logout } = useContext(AuthContext); 
+
 
   const handleLogout = () => {
-    localStorage.removeItem('jwt_token');
+    logout(); // Llama a la función de logout del contexto
     navigate('/');
   };
 
   return (
     <nav style={{
-      backgroundColor: '#1a1a40',
+      // CAMBIO: Fondo semi-transparente para la NavBar
+      backgroundColor: 'rgba(26, 26, 50, 0.8)', // Un tono oscuro con 80% de opacidad
       padding: '15px 30px',
       display: 'flex',
       justifyContent: 'space-between',
@@ -20,7 +27,8 @@ const NavBar = () => {
       position: 'fixed', // Para que la barra de navegación siempre esté visible
       top: 0,
       width: '100%',
-      zIndex: 1000 // Asegura que esté por encima de otros elementos
+      zIndex: 1000, // Asegura que esté por encima de otros elementos
+      borderRadius: '0 0 10px 10px' // Esquinas redondeadas abajo
     }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <Link to="/home-podcasts" style={{ textDecoration: 'none' }}>
@@ -32,27 +40,40 @@ const NavBar = () => {
         <Link to="/profile" style={{ color: '#E6B3FF', textDecoration: 'none', marginLeft: '30px', fontSize: '1.1em', transition: 'color 0.2s' }}>
           Mi Perfil
         </Link>
-        {/* ¡NUEVO ENLACE AL FORMULARIO DE CONTACTO! */}
+        {/* Enlace al formulario de contacto */}
         <Link to="/contact" style={{ color: '#E6B3FF', textDecoration: 'none', marginLeft: '30px', fontSize: '1.1em', transition: 'color 0.2s' }}>
           Contacto
         </Link>
       </div>
-      <button
-        onClick={handleLogout}
-        style={{
-          padding: '10px 20px',
-          backgroundColor: '#cc00cc',
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          fontSize: '1em',
-          fontWeight: 'bold',
-          transition: 'background-color 0.3s ease'
-        }}
-      >
-        Cerrar Sesión
-      </button>
+      {/* Sección de usuario y botón de cerrar sesión */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+        {isAuthenticated && user ? (
+          <>
+            <span style={{ color: '#8AFFD2', fontSize: '1em' }}>Hola, {user.name || user.email}!</span>
+            {user.profile_picture && (
+              <img
+                src={user.profile_picture}
+                alt="Profile"
+                style={{ width: '35px', height: '35px', borderRadius: '50%', objectFit: 'cover' }}
+              />
+            )}
+            <button
+              onClick={handleLogout}
+              // APLICAR: Estilo de botón de peligro
+              style={dangerButtonStyle} 
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c82333'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc3545'}
+            >
+              Cerrar Sesión
+            </button>
+          </>
+        ) : (
+          // Enlace de Iniciar Sesión si no está autenticado
+          <Link to="/" style={{ ...primaryButtonStyle, textDecoration: 'none', textAlign: 'center', backgroundColor: '#007bff' }}>
+            Iniciar Sesión
+          </Link>
+        )}
+      </div>
     </nav>
   );
 };

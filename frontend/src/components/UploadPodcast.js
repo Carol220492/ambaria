@@ -1,13 +1,15 @@
 // frontend/src/components/UploadPodcast.js
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Importa Link
+import { useNavigate, Link } from 'react-router-dom';
 import NavBar from './NavBar';
+import { pageContainerStyle, contentBoxStyle, formInputStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles';
 
 const UploadPodcast = () => {
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
-    const [artist, setArtist] = useState(''); // Si usas user.name como artista, este podría ser redundante
-    const [genre, setGenre] = useState(''); // Si usas 'category' en el backend, renómbralo o mapea.
+    // ELIMINADO: Ya no se usa 'artist'
+    // const [artist, setArtist] = useState(''); 
+    const [genre, setGenre] = useState('');
     const [description, setDescription] = useState('');
     const [audioFile, setAudioFile] = useState(null);
     const [coverImage, setCoverImage] = useState(null);
@@ -36,15 +38,16 @@ const UploadPodcast = () => {
         if (!token) {
             setError('No hay token de autenticación. Por favor, inicia sesión.');
             setLoading(false);
-            navigate('/'); // Redirigir al login si no hay token
+            navigate('/');
             return;
         }
 
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', description);
-        formData.append('category', genre); // Asegúrate de que 'genre' mapee a 'category' en el backend
-        // Solo adjunta archivos si existen
+        formData.append('category', genre);
+        // REMOVIDO: formData.append('artist', artist); ya que el estado 'artist' fue eliminado
+        
         if (audioFile) {
             formData.append('audio_file', audioFile);
         } else {
@@ -61,7 +64,6 @@ const UploadPodcast = () => {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
-                    // 'Content-Type': 'multipart/form-data' no es necesario con FormData, el navegador lo establece.
                 },
                 body: formData,
             });
@@ -71,12 +73,11 @@ const UploadPodcast = () => {
             if (response.ok) {
                 setMessage(data.message);
                 setTitle('');
-                setArtist('');
+                // REMOVIDO: setArtist(''); ya que el estado 'artist' fue eliminado
                 setGenre('');
                 setDescription('');
                 setAudioFile(null);
                 setCoverImage(null);
-                // Opcional: Redirigir después de una subida exitosa
                 navigate('/home-podcasts');
             } else {
                 setError(data.error || 'Error al subir el podcast.');
@@ -90,25 +91,15 @@ const UploadPodcast = () => {
     };
 
     return (
-        <div style={{ backgroundColor: '#1a1a32', minHeight: '100vh', color: 'white', fontFamily: 'Arial, sans-serif' }}>
+        <div style={pageContainerStyle}>
             <NavBar />
-            <div style={{ maxWidth: '600px', margin: '20px auto', padding: '30px', backgroundColor: '#2a2a4a', borderRadius: '10px', boxShadow: '0 0 15px rgba(0, 255, 255, 0.5)' }}>
+            <div style={contentBoxStyle}>
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#00FFFF' }}>Subir Nuevo Podcast</h2>
 
-                {/* --- NUEVOS BOTONES DE NAVEGACIÓN --- */}
                 <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
                     <button
                         onClick={() => navigate(-1)}
-                        style={{
-                            padding: '8px 15px',
-                            backgroundColor: '#555',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                            fontSize: '0.9em',
-                            transition: 'background-color 0.3s ease'
-                        }}
+                        style={secondaryButtonStyle}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#777'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#555'}
                     >
@@ -117,15 +108,9 @@ const UploadPodcast = () => {
                     <Link
                         to="/home-podcasts"
                         style={{
-                            padding: '8px 15px',
-                            backgroundColor: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                            fontSize: '0.9em',
+                            ...primaryButtonStyle,
                             textDecoration: 'none',
-                            transition: 'background-color 0.3s ease'
+                            textAlign: 'center'
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
@@ -133,7 +118,6 @@ const UploadPodcast = () => {
                         🏠 Home
                     </Link>
                 </div>
-                {/* --- FIN NUEVOS BOTONES DE NAVEGACIÓN --- */}
 
                 {message && <p style={{ color: 'lightgreen', textAlign: 'center' }}>{message}</p>}
                 {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
@@ -147,9 +131,10 @@ const UploadPodcast = () => {
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             required
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle}
                         />
                     </div>
+                    {/* REMOVIDO: Campo de artista */}
                     <div>
                         <label htmlFor="genre" style={{ display: 'block', marginBottom: '5px' }}>Género/Categoría:</label>
                         <input
@@ -159,7 +144,7 @@ const UploadPodcast = () => {
                             value={genre}
                             onChange={(e) => setGenre(e.target.value)}
                             required
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle}
                         />
                     </div>
                     <div>
@@ -170,7 +155,7 @@ const UploadPodcast = () => {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             rows="4"
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle}
                         ></textarea>
                     </div>
                     <div>
@@ -182,9 +167,9 @@ const UploadPodcast = () => {
                             accept=".mp3,.wav,.ogg,.aac,.flac"
                             onChange={handleFileChange}
                             required
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle}
                         />
-                        {audioFile && <p style={{ fontSize: '0.9em', color: '#555' }}>Seleccionado: {audioFile.name}</p>}
+                        {audioFile && <p style={{ fontSize: '0.9em', color: '#ccc' }}>Seleccionado: {audioFile.name}</p>}
                     </div>
                     <div>
                         <label htmlFor="cover_image" style={{ display: 'block', marginBottom: '5px' }}>Imagen de Portada (Opcional):</label>
@@ -194,23 +179,15 @@ const UploadPodcast = () => {
                             name="cover_image"
                             accept=".png,.jpg,.jpeg,.gif"
                             onChange={handleFileChange}
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle}
                         />
-                        {coverImage && <p style={{ fontSize: '0.9em', color: '#555' }}>Seleccionado: {coverImage.name}</p>}
+                        {coverImage && <p style={{ fontSize: '0.9em', color: '#ccc' }}>Seleccionado: {coverImage.name}</p>}
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading}
-                        style={{
-                            padding: '10px 15px',
-                            backgroundColor: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                            fontSize: '16px'
-                        }}
+                        style={primaryButtonStyle}
                     >
                         {loading ? 'Subiendo...' : 'Subir Podcast'}
                     </button>

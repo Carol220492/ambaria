@@ -5,9 +5,9 @@ export const pageContainerStyle = {
   backgroundColor: 'transparent', // Crucial para ver el VideoBackground
   minHeight: '100vh',
   color: 'white',
-  padding: '20px',
+  padding: '20px', // Mantiene el padding general
+  paddingTop: '80px', // <--- ¡NUEVA LÍNEA CLAVE! Añade espacio desde la parte superior para la NavBar
   fontFamily: 'Arial, sans-serif',
-  // Otros estilos generales de página si los tienes (ej. flexbox, alineación)
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center', // Centra horizontalmente el contenido principal

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-// --- IMPORTAR ESTILOS COMUNES ---
+// IMPORTAR ESTILOS COMUNES
 import { pageContainerStyle, contentBoxStyle, primaryButtonStyle, secondaryButtonStyle, dangerButtonStyle } from '../styles/commonStyles';
 
 const Profile = () => {
@@ -148,10 +148,12 @@ const Profile = () => {
 
 
   if (loading) {
+    // APLICAR: pageContainerStyle para el div externo
     return <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>Cargando perfil...</div>;
   }
 
   if (error) {
+    // APLICAR: pageContainerStyle para el div externo
     return (
       <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
         <p>{error}</p>
@@ -163,19 +165,22 @@ const Profile = () => {
   }
 
   if (!userData) {
+      // APLICAR: pageContainerStyle para el div externo
       return <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>No se encontraron datos de usuario.</div>;
   }
 
   return (
-    // Aplicar estilo de contenedor de página común
+    // APLICAR: pageContainerStyle al div más externo para un fondo transparente
     <div style={pageContainerStyle}>
-      <div style={contentBoxStyle}> {/* Aplicar estilo de caja de contenido común */}
+      {/* APLICAR: contentBoxStyle al div que contiene el contenido principal */}
+      <div style={contentBoxStyle}>
         <h1 style={{ color: '#00FFFF', marginBottom: '20px' }}>Mi Perfil</h1>
 
+        {/* Botones de navegación usando estilos comunes */}
         <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
             <button
                 onClick={() => navigate(-1)}
-                style={secondaryButtonStyle} // Aplicar estilo de botón secundario
+                style={secondaryButtonStyle} // APLICAR: secondaryButtonStyle
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#777'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#555'}
             >
@@ -184,7 +189,7 @@ const Profile = () => {
             <Link
                 to="/home-podcasts"
                 style={{
-                    ...primaryButtonStyle, // Aplicar estilo de botón primario
+                    ...primaryButtonStyle, // APLICAR: primaryButtonStyle
                     textDecoration: 'none',
                     textAlign: 'center'
                 }}
@@ -218,7 +223,7 @@ const Profile = () => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
             {userPodcasts.map((podcast) => (
               <div key={podcast.id} style={{
-                backgroundColor: '#3a3a5a',
+                backgroundColor: '#3a3a5a', // Estilo específico para cada tarjeta de podcast
                 borderRadius: '8px',
                 padding: '15px',
                 boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
@@ -247,7 +252,7 @@ const Profile = () => {
                 <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
                     <button
                         onClick={() => handleEditPodcast(podcast.id)}
-                        style={primaryButtonStyle} // Aplicar estilo de botón primario
+                        style={primaryButtonStyle} // APLICAR: primaryButtonStyle
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
                     >
@@ -255,7 +260,7 @@ const Profile = () => {
                     </button>
                     <button
                         onClick={() => handleDeletePodcast(podcast.id)}
-                        style={dangerButtonStyle} // Aplicar estilo de botón de peligro
+                        style={dangerButtonStyle} // APLICAR: dangerButtonStyle
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c82333'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#dc3545'}
                     >

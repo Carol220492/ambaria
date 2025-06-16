@@ -1,8 +1,10 @@
 // frontend/src/components/EditPodcast.js
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom'; // Importa Link
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import NavBar from './NavBar';
+// IMPORTAR ESTILOS COMUNES
+import { pageContainerStyle, contentBoxStyle, formInputStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles';
 
 const EditPodcast = () => {
     const { id } = useParams();
@@ -35,7 +37,7 @@ const EditPodcast = () => {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                const podcast = response.data; // Asumiendo que el backend devuelve el podcast directamente
+                const podcast = response.data;
                 setTitle(podcast.title);
                 setDescription(podcast.description);
                 setCategory(podcast.category);
@@ -89,7 +91,7 @@ const EditPodcast = () => {
 
             if (response.status === 200) {
                 setMessage('Podcast actualizado con éxito!');
-                navigate('/profile'); // Redirigir al perfil después de editar
+                navigate('/profile');
             } else {
                 setError(response.data.error || 'Error al actualizar el podcast.');
             }
@@ -102,33 +104,28 @@ const EditPodcast = () => {
     };
 
     if (loading) {
-        return <div style={{ textAlign: 'center', color: 'white', marginTop: '50px' }}>Cargando datos del podcast...</div>;
+        // APLICAR: pageContainerStyle para el div externo
+        return <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>Cargando datos del podcast...</div>;
     }
 
     if (error) {
-        return <div style={{ textAlign: 'center', color: 'red', marginTop: '50px' }}>Error: {error}</div>;
+        // APLICAR: pageContainerStyle para el div externo
+        return <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>Error: {error}</div>;
     }
 
     return (
-        <div>
+        // APLICAR: pageContainerStyle al div más externo para un fondo transparente
+        <div style={pageContainerStyle}>
             <NavBar />
-            <div style={{ padding: '20px', maxWidth: '600px', margin: '20px auto', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '2px 2px 8px rgba(0,0,0,0.1)', backgroundColor: '#2a2a4a', color: 'white' }}>
+            {/* APLICAR: contentBoxStyle al div que contiene el formulario de edición */}
+            <div style={contentBoxStyle}>
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#00FFFF' }}>Editar Podcast</h2>
 
-                {/* --- NUEVOS BOTONES DE NAVEGACIÓN --- */}
+                {/* Botones de navegación usando estilos comunes */}
                 <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
                     <button
                         onClick={() => navigate(-1)}
-                        style={{
-                            padding: '8px 15px',
-                            backgroundColor: '#555',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                            fontSize: '0.9em',
-                            transition: 'background-color 0.3s ease'
-                        }}
+                        style={secondaryButtonStyle} // APLICAR: secondaryButtonStyle
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#777'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#555'}
                     >
@@ -137,15 +134,9 @@ const EditPodcast = () => {
                     <Link
                         to="/home-podcasts"
                         style={{
-                            padding: '8px 15px',
-                            backgroundColor: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                            fontSize: '0.9em',
+                            ...primaryButtonStyle, // APLICAR: primaryButtonStyle
                             textDecoration: 'none',
-                            transition: 'background-color 0.3s ease'
+                            textAlign: 'center'
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0056b3'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
@@ -153,7 +144,6 @@ const EditPodcast = () => {
                         🏠 Home
                     </Link>
                 </div>
-                {/* --- FIN NUEVOS BOTONES DE NAVEGACIÓN --- */}
 
                 {message && <p style={{ color: 'lightgreen', textAlign: 'center' }}>{message}</p>}
                 {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
@@ -166,7 +156,7 @@ const EditPodcast = () => {
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             required
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle} // APLICAR: formInputStyle
                         />
                     </div>
                     <div>
@@ -177,7 +167,7 @@ const EditPodcast = () => {
                             value={category}
                             onChange={(e) => setCategory(e.target.value)}
                             required
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle} // APLICAR: formInputStyle
                         />
                     </div>
                     <div>
@@ -186,9 +176,8 @@ const EditPodcast = () => {
                             id="description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            required
                             rows="4"
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle} // APLICAR: formInputStyle
                         ></textarea>
                     </div>
                     <div>
@@ -199,7 +188,7 @@ const EditPodcast = () => {
                             name="audio_file"
                             accept=".mp3,.wav,.ogg,.aac,.flac"
                             onChange={handleFileChange}
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle} // APLICAR: formInputStyle
                         />
                         {audioFile && <p style={{ fontSize: '0.9em', color: '#ccc' }}>Seleccionado: {audioFile.name}</p>}
                     </div>
@@ -211,7 +200,7 @@ const EditPodcast = () => {
                             name="cover_image"
                             accept=".png,.jpg,.jpeg,.gif"
                             onChange={handleFileChange}
-                            style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#3a3a5a', color: 'white' }}
+                            style={formInputStyle} // APLICAR: formInputStyle
                         />
                         {coverImage && <p style={{ fontSize: '0.9em', color: '#ccc' }}>Seleccionado: {coverImage.name}</p>}
                     </div>
@@ -219,15 +208,7 @@ const EditPodcast = () => {
                     <button
                         type="submit"
                         disabled={submitting}
-                        style={{
-                            padding: '10px 15px',
-                            backgroundColor: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: submitting ? 'not-allowed' : 'pointer',
-                            fontSize: '16px'
-                        }}
+                        style={primaryButtonStyle} // APLICAR: primaryButtonStyle
                     >
                         {submitting ? 'Actualizando...' : 'Actualizar Podcast'}
                     </button>
