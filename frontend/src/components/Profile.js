@@ -1,6 +1,5 @@
-// frontend/src/components/Profile.js
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Eliminamos 'Link'
 import axios from 'axios'; // Importa Axios
 
 const Profile = () => {
@@ -74,7 +73,7 @@ const Profile = () => {
     const fetchUserPodcasts = async () => {
       try {
         console.log(`DEBUG PROFILE: Obteniendo podcasts del usuario de: ${API_URL}/podcasts/my_podcasts`);
-        const response = await axios.get(`${API_URL}/podcasts/my_podcasts`, {
+        const response = await axios.get(`${API_URL}/podcasts/my_podcasts`, { // <--- ¡URL CORREGIDA AQUÍ!
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -100,6 +99,7 @@ const Profile = () => {
       }
     };
 
+    // Solo intenta cargar los podcasts si los datos del usuario se han cargado (o si el token existe al menos)
     if (!loading && !error) {
         fetchUserPodcasts();
     }
@@ -108,10 +108,10 @@ const Profile = () => {
   // NUEVA FUNCIÓN: Manejar la eliminación de un podcast
   const handleDeletePodcast = async (podcastId) => {
     if (!window.confirm("¿Estás seguro de que quieres eliminar este podcast? Esta acción no se puede deshacer.")) {
-      return;
+      return; // El usuario canceló la eliminación
     }
 
-    setPodcastLoading(true);
+    setPodcastLoading(true); // Mostrar estado de carga mientras se elimina
     const token = localStorage.getItem('jwt_token');
 
     try {
@@ -124,6 +124,7 @@ const Profile = () => {
 
       if (response.status === 200) {
         alert(response.data.message);
+        // Actualizar la lista de podcasts en el estado para reflejar la eliminación
         setUserPodcasts(userPodcasts.filter(p => p.id !== podcastId));
       } else {
         alert(response.data.error || "Error al eliminar el podcast.");
@@ -140,7 +141,7 @@ const Profile = () => {
           alert("Error al conectar con el servidor o eliminar el podcast.");
       }
     } finally {
-      setPodcastLoading(false);
+      setPodcastLoading(false); // Quitar estado de carga
     }
   };
 
@@ -173,7 +174,7 @@ const Profile = () => {
     <div style={{ padding: '20px', backgroundColor: '#1a1a32', minHeight: '100vh', color: 'white', fontFamily: 'Arial, sans-serif' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: '#2a2a4a', padding: '30px', borderRadius: '10px', boxShadow: '0 0 15px rgba(0, 255, 255, 0.5)' }}>
         <h1 style={{ color: '#00FFFF', marginBottom: '20px' }}>Mi Perfil</h1>
-
+        
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '30px', borderBottom: '1px solid #444', paddingBottom: '20px' }}>
           {userData.profile_picture && (
             <img src={userData.profile_picture} alt="Foto de Perfil" style={{ borderRadius: '50%', width: '120px', height: '120px', objectFit: 'cover', marginRight: '20px', border: '3px solid #cc00cc' }} />
@@ -196,43 +197,43 @@ const Profile = () => {
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
             {userPodcasts.map((podcast) => (
-              <div key={podcast.id} style={{
-                backgroundColor: '#3a3a5a',
-                borderRadius: '8px',
-                padding: '15px',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
-                display: 'flex',
-                flexDirection: 'column',
+              <div key={podcast.id} style={{ 
+                backgroundColor: '#3a3a5a', 
+                borderRadius: '8px', 
+                padding: '15px', 
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', 
+                display: 'flex', 
+                flexDirection: 'column', 
                 alignItems: 'center',
                 textAlign: 'center'
               }}>
                 {podcast.cover_image_url && (
-                  <img
-                    src={podcast.cover_image_url}
-                    alt={podcast.title}
-                    style={{
-                      width: '100%',
-                      height: '150px',
-                      objectFit: 'cover',
-                      borderRadius: '4px',
-                      marginBottom: '10px'
-                    }}
+                  <img 
+                    src={podcast.cover_image_url} 
+                    alt={podcast.title} 
+                    style={{ 
+                      width: '100%', 
+                      height: '150px', 
+                      objectFit: 'cover', 
+                      borderRadius: '4px', 
+                      marginBottom: '10px' 
+                    }} 
                   />
                 )}
                 <h3 style={{ color: '#00FFFF', fontSize: '1.2em', margin: '10px 0' }}>{podcast.title}</h3>
                 <p style={{ color: '#ccc', fontSize: '0.9em', margin: '0 0 10px 0' }}>Artista: {podcast.artist}</p>
                 <p style={{ color: '#aaa', fontSize: '0.8em', margin: '0 0 15px 0', maxHeight: '60px', overflow: 'hidden' }}>{podcast.description}</p>
-
+                
                 <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
-                    <button
-                        onClick={() => handleEditPodcast(podcast.id)} // <--- ¡CAMBIO AQUÍ!
-                        style={{
-                            padding: '8px 15px',
-                            backgroundColor: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
+                    <button 
+                        onClick={() => handleEditPodcast(podcast.id)}
+                        style={{ 
+                            padding: '8px 15px', 
+                            backgroundColor: '#007bff', 
+                            color: 'white', 
+                            border: 'none', 
+                            borderRadius: '5px', 
+                            cursor: 'pointer', 
                             fontSize: '0.9em',
                             transition: 'background-color 0.3s ease'
                         }}
@@ -241,15 +242,15 @@ const Profile = () => {
                     >
                         Editar
                     </button>
-                    <button
-                        onClick={() => handleDeletePodcast(podcast.id)}
-                        style={{
-                            padding: '8px 15px',
-                            backgroundColor: '#dc3545',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
+                    <button 
+                        onClick={() => handleDeletePodcast(podcast.id)} 
+                        style={{ 
+                            padding: '8px 15px', 
+                            backgroundColor: '#dc3545', 
+                            color: 'white', 
+                            border: 'none', 
+                            borderRadius: '5px', 
+                            cursor: 'pointer', 
                             fontSize: '0.9em',
                             transition: 'background-color 0.3s ease'
                         }}

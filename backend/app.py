@@ -7,17 +7,20 @@ import json
 from dotenv import load_dotenv
 from flask_migrate import Migrate
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity 
-import urllib.parse # <-- ¡NUEVA IMPORTACIÓN!
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+import urllib.parse # <-- NUEVA IMPORTACIÓN!
 from backend.config import Config # Añade esta línea
 
 load_dotenv() # Cargar variables de entorno al iniciar la aplicación
 
 from backend.extensions import db
 from backend.models.user import User
+# from backend.models.podcast import Podcast # Puedes quitar esto si no lo usas directamente aquí
+from backend.models.comment import Comment # <--- ¡NUEVA IMPORTACIÓN!
 
 from backend.routes.upload_routes import upload_bp
 from backend.routes.podcast_routes import podcast_bp
+from backend.routes.comment_routes import comment_bp # <--- ¡NUEVA IMPORTACIÓN!
 
 app = Flask(__name__)
 app.config.from_object(Config) # Cambiado de from_pyfile a from_object
@@ -28,29 +31,27 @@ if not os.path.exists(instance_path):
     os.makedirs(instance_path)
     print(f"DEBUG APP: Creada carpeta de instancia: {instance_path}")
 
-app.secret_key = app.config['SECRET_KEY'] 
+app.secret_key = app.config['SECRET_KEY']
 
 CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 
 db.init_app(app)
 migrate = Migrate(app, db)
 
-# --- ¡INICIALIZAR JWTManager DESPUÉS DE app = Flask(__name__) Y app.config.from_pyfile! ---
-# Es CRUCIAL que JWTManager se inicialice con las configuraciones de app.config
-# Asegúrate de que tu 'config.py' tenga JWT_SECRET_KEY y JWT_TOKEN_LOCATION
 jwt = JWTManager(app)
 
 # Configuración de Google OAuth 2.0 (obtenidas de la Consola de Google Cloud)
 app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
 app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET')
 app.config['GOOGLE_AUTHORIZE_URL'] = 'https://accounts.google.com/o/oauth2/auth'
-app.config['GOOGLE_TOKEN_URL'] = 'https://accounts.google.com/o/oauth2/token'
+app.config['GOOGLE_TOKEN_URL'] = 'https://oauth2.googleapis.com/token'
 app.config['GOOGLE_USERINFO_URL'] = 'https://www.googleapis.com/oauth2/v1/userinfo'
 app.config['GOOGLE_REDIRECT_URI'] = os.environ.get('GOOGLE_REDIRECT_URI') or 'http://localhost:5000/auth/google/callback'
 
 # Registrar Blueprints
 app.register_blueprint(upload_bp)
 app.register_blueprint(podcast_bp)
+app.register_blueprint(comment_bp) # <--- ¡NUEVO REGISTRO!
 
 # --- Rutas de Autenticación con Google OAuth ---
 @app.route('/auth/google')
@@ -65,8 +66,7 @@ def google_oauth_login():
         'access_type': 'offline',
         'prompt': 'consent' # Opcional: 'select_account' o 'consent' si quieres forzar la selección de cuenta o el consentimiento
     }
-    # return redirect(f"{app.config['GOOGLE_AUTHORIZE_URL']}?{requests.utils.urlencode(params)}") # Línea anterior
-    return redirect(f"{app.config['GOOGLE_AUTHORIZE_URL']}?{urllib.parse.urlencode(params)}") # <-- ¡CAMBIO CLAVE AQUÍ!
+    return redirect(f"{app.config['GOOGLE_AUTHORIZE_URL']}?{urllib.parse.urlencode(params)}")
 
 @app.route('/auth/google/callback')
 def google_oauth_callback():
@@ -118,9 +118,8 @@ def google_oauth_callback():
             db.session.commit()
 
         # Generar token JWT
-        # Convierte user.id a string para el identity del token JWT
         access_token = create_access_token(
-            identity=str(user.id),  
+            identity=str(user.id),
             additional_claims={
                 "email": user.email,
                 "profile_picture": user.profile_picture
@@ -138,17 +137,17 @@ def google_oauth_callback():
 @jwt_required()
 def get_profile():
     current_user_id = get_jwt_identity()
-    print(f"DEBUG BACKEND: Intentando obtener perfil para user_id: {current_user_id}") 
+    print(f"DEBUG BACKEND: Intentando obtener perfil para user_id: {current_user_id}")
 
     try:
         user_id_int = int(current_user_id)
     except ValueError:
         return jsonify({"message": "ID de usuario inválido en el token."}), 400
 
-    user = User.query.get(user_id_int) 
+    user = User.query.get(user_id_int)
 
     if user:
-        print(f"DEBUG BACKEND: Usuario encontrado: {user.name}") 
+        print(f"DEBUG BACKEND: Usuario encontrado: {user.name}")
         return jsonify({
             "message": f"¡Bienvenido, {user.name}!",
             "user_id": user.id,
@@ -159,16 +158,16 @@ def get_profile():
         print(f"DEBUG BACKEND: Usuario con ID {current_user_id} no encontrado en la base de datos.")
         return jsonify({"message": "Usuario no encontrado."}), 404
 
-@app.route('/logout', methods=['POST']) 
-@jwt_required() 
+@app.route('/logout', methods=['POST'])
+@jwt_required()
 def logout():
     session.pop('user_id', None)
     session.pop('google_id', None)
     session.pop('email', None)
-    
+
     return jsonify({"message": "Sesión cerrada con éxito."})
 
-# --- Mantener tus rutas existentes: ---
+# --- Mantener tus rutas existentes (solo para claridad, ya están registradas como Blueprints): ---
 @app.route('/')
 def hello():
     return jsonify({"message": "Bienvenido a la API de Ambaria."}), 200
@@ -180,5 +179,5 @@ if __name__ == '__main__':
     if not app.config['JWT_SECRET_KEY']:
         print("ADVERTENCIA: La variable de entorno JWT_SECRET_KEY no está configurada.")
         print("Los tokens JWT no se firmarán correctamente. Crea un archivo .env o configúrala manualmente.")
-    
+
     app.run(debug=True, port=5000)
