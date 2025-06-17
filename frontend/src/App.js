@@ -1,18 +1,18 @@
 // frontend/src/App.js
 
 import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-router-dom';
-import Home from './components/Home';
+import Home from './components/Home'; // Esto es tu LoginPage
 import Profile from './components/Profile';
 import AuthHandler from './components/AuthHandler';
 import HomePodcasts from './components/HomePodcasts';
 import UploadPodcast from './components/UploadPodcast';
-import NavBar from './components/NavBar';
+import NavBar from './components/NavBar'; // <-- Importa NavBar aquí
 import PodcastDetail from './components/PodcastDetail';
 import ContactForm from './components/ContactForm';
 import GlobalAudioPlayer from './components/GlobalAudioPlayer';
 import EditPodcast from './components/EditPodcast';
 import { AuthProvider } from './context/AuthContext';
-import VideoBackground from './components/VideoBackground'; // <--- ¡IMPORTACIÓN DEL NUEVO COMPONENTE!
+import VideoBackground from './components/VideoBackground';
 
 const PrivateRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('jwt_token');
@@ -22,16 +22,26 @@ const PrivateRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        {/* --- COLOCA EL VIDEOBACKGROUND AQUÍ, AL PRINCIPIO DEL CONTENEDOR PRINCIPAL --- */}
-        <VideoBackground /> {/* <--- ¡AÑADIDO AQUÍ! */}
+      <AuthProvider> {/* <-- AuthProvider envuelve todo */}
+        <VideoBackground />
 
-        {/* Asegura que el contenido de la aplicación esté por encima del video de fondo */}
-        <div className="App" style={{ position: 'relative', zIndex: 1 }}>
+        {/* CONTENEDOR PRINCIPAL - Asegura que el contenido esté por encima del video */}
+        {/* Añadido paddingTop para compensar la altura del NavBar fijo (ajusta '80px' si tu NavBar es más alto/bajo) */}
+        <div className="App" style={{ position: 'relative', zIndex: 1, paddingTop: '80px' }}>
+          
+          {/*
+            NAVBAR GLOBAL - Renderizado UNA SOLA VEZ aquí.
+            Se mostrará en TODAS las rutas (HomePodcasts, UploadPodcast, PodcastDetail, EditPodcast, Profile, Contact).
+            Home (la página de login) y AuthHandler NO tendrán este Navbar.
+          */}
+          <NavBar /> {/* <--- ¡MOVIDO Y POSICIONADO AQUÍ, UNA SOLA VEZ! */}
+
           <Routes>
+            {/* Rutas Públicas SIN NavBar (Home/Login y AuthHandler) */}
             <Route path="/" element={<Home />} />
             <Route path="/auth-callback" element={<AuthHandler />} />
 
+            {/* Rutas con NavBar global (ContactForm y ContactSuccess) */}
             <Route path="/contact" element={<ContactForm />} />
             <Route
               path="/contact-success"
@@ -44,12 +54,12 @@ function App() {
               }
             />
 
-            {/* Rutas Protegidas */}
+            {/* Rutas Protegidas - IMPORTANTÍSIMO: NO deben contener <NavBar /> internamente */}
             <Route
               path="/profile"
               element={
                 <PrivateRoute>
-                  <NavBar />
+                  {/* ELIMINADO: <NavBar /> */}
                   <Profile />
                 </PrivateRoute>
               }
@@ -58,7 +68,7 @@ function App() {
               path="/home-podcasts"
               element={
                 <PrivateRoute>
-                  <NavBar />
+                  {/* ELIMINADO: <NavBar /> */}
                   <HomePodcasts />
                 </PrivateRoute>
               }
@@ -67,7 +77,7 @@ function App() {
               path="/upload-podcast"
               element={
                 <PrivateRoute>
-                  <NavBar />
+                  {/* ELIMINADO: <NavBar /> */}
                   <UploadPodcast />
                 </PrivateRoute>
               }
@@ -76,7 +86,7 @@ function App() {
               path="/podcast/:id"
               element={
                 <PrivateRoute>
-                  <NavBar />
+                  {/* ELIMINADO: <NavBar /> */}
                   <PodcastDetail />
                 </PrivateRoute>
               }
@@ -85,7 +95,7 @@ function App() {
               path="/edit-podcast/:id"
               element={
                 <PrivateRoute>
-                  <NavBar />
+                  {/* ELIMINADO: <NavBar /> */}
                   <EditPodcast />
                 </PrivateRoute>
               }

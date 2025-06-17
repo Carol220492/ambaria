@@ -50,6 +50,7 @@ const NavBar = () => {
         {isAuthenticated && user ? (
           <>
             <span style={{ color: '#8AFFD2', fontSize: '1em' }}>Hola, {user.name || user.email}!</span>
+            {/* ELIMINADA LA IMAGEN DE PERFIL:
             {user.profile_picture && (
               <img
                 src={user.profile_picture}
@@ -57,6 +58,7 @@ const NavBar = () => {
                 style={{ width: '35px', height: '35px', borderRadius: '50%', objectFit: 'cover' }}
               />
             )}
+            */}
             <button
               onClick={handleLogout}
               // APLICAR: Estilo de botón de peligro

@@ -1,14 +1,12 @@
 // frontend/src/components/UploadPodcast.js
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import NavBar from './NavBar';
+// ELIMINA ESTA LÍNEA: import NavBar from './NavBar'; // <--- ¡ASEGÚRATE DE QUE ESTA LÍNEA NO ESTÉ!
 import { pageContainerStyle, contentBoxStyle, formInputStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles';
 
 const UploadPodcast = () => {
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
-    // ELIMINADO: Ya no se usa 'artist'
-    // const [artist, setArtist] = useState(''); 
     const [genre, setGenre] = useState('');
     const [description, setDescription] = useState('');
     const [audioFile, setAudioFile] = useState(null);
@@ -46,7 +44,6 @@ const UploadPodcast = () => {
         formData.append('title', title);
         formData.append('description', description);
         formData.append('category', genre);
-        // REMOVIDO: formData.append('artist', artist); ya que el estado 'artist' fue eliminado
         
         if (audioFile) {
             formData.append('audio_file', audioFile);
@@ -73,7 +70,6 @@ const UploadPodcast = () => {
             if (response.ok) {
                 setMessage(data.message);
                 setTitle('');
-                // REMOVIDO: setArtist(''); ya que el estado 'artist' fue eliminado
                 setGenre('');
                 setDescription('');
                 setAudioFile(null);
@@ -92,7 +88,7 @@ const UploadPodcast = () => {
 
     return (
         <div style={pageContainerStyle}>
-            <NavBar />
+            {/* ELIMINA ESTA LÍNEA: <NavBar /> */} {/* <--- ¡ASEGÚRATE DE QUE ESTA LÍNEA NO ESTÉ! */}
             <div style={contentBoxStyle}>
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#00FFFF' }}>Subir Nuevo Podcast</h2>
 
@@ -134,7 +130,6 @@ const UploadPodcast = () => {
                             style={formInputStyle}
                         />
                     </div>
-                    {/* REMOVIDO: Campo de artista */}
                     <div>
                         <label htmlFor="genre" style={{ display: 'block', marginBottom: '5px' }}>Género/Categoría:</label>
                         <input

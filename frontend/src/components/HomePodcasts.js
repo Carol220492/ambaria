@@ -1,10 +1,10 @@
 // frontend/src/components/HomePodcasts.js
-import React, { useEffect, useState } from 'react'; // Eliminado useContext si no se usa
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import NavBar from './NavBar';
+// ELIMINA ESTA LÍNEA: import NavBar from './NavBar';
 import audioPlayerStore from '../store/useAudioPlayerStore';
-import { pageContainerStyle, contentBoxStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles'; // Importa secondaryButtonStyle
+import { pageContainerStyle, contentBoxStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles';
 
 const HomePodcasts = () => {
   const [podcasts, setPodcasts] = useState([]);
@@ -16,7 +16,7 @@ const HomePodcasts = () => {
 
   // --- NUEVOS ESTADOS PARA CATEGORÍAS Y FILTRO ---
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('All'); // 'All' para mostrar todas las categorías inicialmente
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -30,11 +30,10 @@ const HomePodcasts = () => {
         return;
       }
 
-      setLoading(true); // Siempre que se inicie la carga, mostrar loader
-      setError(null); // Limpiar errores previos
+      setLoading(true);
+      setError(null);
 
       let url = `${API_URL}/podcasts`;
-      // Si hay una categoría seleccionada (y no es 'All'), añadirla como parámetro de consulta
       if (selectedCategory && selectedCategory !== 'All') {
         url = `${API_URL}/podcasts?category=${encodeURIComponent(selectedCategory)}`;
       }
@@ -55,19 +54,19 @@ const HomePodcasts = () => {
             navigate('/', { replace: true });
         }
       } finally {
-          setLoading(false); // Asegurarse de ocultar el loader al finalizar
+          setLoading(false);
       }
     };
 
     fetchPodcasts();
-  }, [navigate, API_URL, selectedCategory]); // Dependencia clave: selectedCategory
+  }, [navigate, API_URL, selectedCategory]);
 
   // --- NUEVO EFECTO PARA OBTENER CATEGORÍAS ---
   useEffect(() => {
     const fetchCategories = async () => {
       const token = localStorage.getItem('jwt_token');
       if (!token) {
-        return; // No intentar obtener categorías si no está autenticado
+        return;
       }
       try {
         const response = await axios.get(`${API_URL}/categories`, {
@@ -75,7 +74,6 @@ const HomePodcasts = () => {
             'Authorization': `Bearer ${token}`
           }
         });
-        // Añadir 'All' al principio de la lista de categorías
         setCategories(['All', ...response.data.categories]);
       } catch (err) {
         console.error('Error al obtener categorías:', err);
@@ -84,15 +82,14 @@ const HomePodcasts = () => {
     fetchCategories();
   }, [API_URL]);
 
-
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
   };
 
-  if (loading && podcasts.length === 0) { // Mostrar cargando solo si no hay podcasts ya cargados
+  if (loading && podcasts.length === 0) {
     return (
       <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>
-        <NavBar />
+        {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
         <p>Cargando podcasts...</p>
       </div>
     );
@@ -101,7 +98,7 @@ const HomePodcasts = () => {
   if (error) {
     return (
       <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
-        <NavBar />
+        {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
         <p>{error}</p>
         <button onClick={() => navigate('/')} style={primaryButtonStyle}>Volver a Iniciar Sesión</button>
       </div>
@@ -110,32 +107,32 @@ const HomePodcasts = () => {
 
   return (
     <div style={pageContainerStyle}>
-      <NavBar />
+      {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
       <div style={{ ...contentBoxStyle, maxWidth: '1200px' }}>
         <h1 style={{ color: '#00FFFF', marginBottom: '20px', textAlign: 'center' }}>Explorar Podcasts</h1>
 
         {/* --- CARRUSEL DE CATEGORÍAS --- */}
         <div style={{
-          overflowX: 'auto', // Permite el desplazamiento horizontal
-          whiteSpace: 'nowrap', // Evita que los elementos se envuelvan a la siguiente línea
-          paddingBottom: '10px', // Espacio para la barra de desplazamiento
+          overflowX: 'auto',
+          whiteSpace: 'nowrap',
+          paddingBottom: '10px',
           marginBottom: '30px',
-          display: 'flex', // Asegura que los elementos estén en una fila
-          gap: '10px', // Espacio entre los botones
-          justifyContent: 'center', // Centra los elementos horizontalmente
+          display: 'flex',
+          gap: '10px',
+          justifyContent: 'center',
         }}>
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => handleCategoryClick(category)}
               style={{
-                ...secondaryButtonStyle, // Estilo base para los botones de categoría
-                backgroundColor: selectedCategory === category ? '#007bff' : '#555', // Azul si seleccionado, gris si no
+                ...secondaryButtonStyle,
+                backgroundColor: selectedCategory === category ? '#007bff' : '#555',
                 color: 'white',
                 padding: '8px 15px',
-                borderRadius: '20px', // Botones más redondeados
+                borderRadius: '20px',
                 cursor: 'pointer',
-                flexShrink: 0, // Evita que los botones se encojan
+                flexShrink: 0,
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = selectedCategory === category ? '#0056b3' : '#777'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = selectedCategory === category ? '#007bff' : '#555'}

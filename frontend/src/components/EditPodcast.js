@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import NavBar from './NavBar';
+// ELIMINA ESTA LÍNEA: import NavBar from './NavBar';
 // IMPORTAR ESTILOS COMUNES
 import { pageContainerStyle, contentBoxStyle, formInputStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles';
 
@@ -104,28 +104,23 @@ const EditPodcast = () => {
     };
 
     if (loading) {
-        // APLICAR: pageContainerStyle para el div externo
         return <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>Cargando datos del podcast...</div>;
     }
 
     if (error) {
-        // APLICAR: pageContainerStyle para el div externo
         return <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>Error: {error}</div>;
     }
 
     return (
-        // APLICAR: pageContainerStyle al div más externo para un fondo transparente
         <div style={pageContainerStyle}>
-            <NavBar />
-            {/* APLICAR: contentBoxStyle al div que contiene el formulario de edición */}
+            {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
             <div style={contentBoxStyle}>
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#00FFFF' }}>Editar Podcast</h2>
 
-                {/* Botones de navegación usando estilos comunes */}
                 <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
                     <button
                         onClick={() => navigate(-1)}
-                        style={secondaryButtonStyle} // APLICAR: secondaryButtonStyle
+                        style={secondaryButtonStyle}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#777'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#555'}
                     >
@@ -134,7 +129,7 @@ const EditPodcast = () => {
                     <Link
                         to="/home-podcasts"
                         style={{
-                            ...primaryButtonStyle, // APLICAR: primaryButtonStyle
+                            ...primaryButtonStyle,
                             textDecoration: 'none',
                             textAlign: 'center'
                         }}
@@ -156,7 +151,7 @@ const EditPodcast = () => {
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             required
-                            style={formInputStyle} // APLICAR: formInputStyle
+                            style={formInputStyle}
                         />
                     </div>
                     <div>
@@ -167,7 +162,7 @@ const EditPodcast = () => {
                             value={category}
                             onChange={(e) => setCategory(e.target.value)}
                             required
-                            style={formInputStyle} // APLICAR: formInputStyle
+                            style={formInputStyle}
                         />
                     </div>
                     <div>
@@ -177,7 +172,7 @@ const EditPodcast = () => {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             rows="4"
-                            style={formInputStyle} // APLICAR: formInputStyle
+                            style={formInputStyle}
                         ></textarea>
                     </div>
                     <div>
@@ -188,7 +183,7 @@ const EditPodcast = () => {
                             name="audio_file"
                             accept=".mp3,.wav,.ogg,.aac,.flac"
                             onChange={handleFileChange}
-                            style={formInputStyle} // APLICAR: formInputStyle
+                            style={formInputStyle}
                         />
                         {audioFile && <p style={{ fontSize: '0.9em', color: '#ccc' }}>Seleccionado: {audioFile.name}</p>}
                     </div>
@@ -200,7 +195,7 @@ const EditPodcast = () => {
                             name="cover_image"
                             accept=".png,.jpg,.jpeg,.gif"
                             onChange={handleFileChange}
-                            style={formInputStyle} // APLICAR: formInputStyle
+                            style={formInputStyle}
                         />
                         {coverImage && <p style={{ fontSize: '0.9em', color: '#ccc' }}>Seleccionado: {coverImage.name}</p>}
                     </div>
@@ -208,7 +203,7 @@ const EditPodcast = () => {
                     <button
                         type="submit"
                         disabled={submitting}
-                        style={primaryButtonStyle} // APLICAR: primaryButtonStyle
+                        style={primaryButtonStyle}
                     >
                         {submitting ? 'Actualizando...' : 'Actualizar Podcast'}
                     </button>

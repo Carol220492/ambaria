@@ -1,7 +1,7 @@
 // frontend/src/components/ContactForm.js
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import NavBar from './NavBar';
+// ELIMINA ESTA LÍNEA: import NavBar from './NavBar';
 // IMPORTAR ESTILOS COMUNES
 import { pageContainerStyle, contentBoxStyle, formInputStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles';
 
@@ -35,18 +35,15 @@ const ContactForm = () => {
     };
 
     return (
-        // APLICAR: pageContainerStyle al div más externo para un fondo transparente
         <div style={pageContainerStyle}>
-            <NavBar />
-            {/* APLICAR: contentBoxStyle al div que contiene el formulario de contacto */}
+            {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
             <div style={contentBoxStyle}>
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#00FFFF' }}>Contáctanos</h2>
 
-                {/* Botones de navegación usando estilos comunes */}
                 <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
                     <button
                         onClick={() => navigate(-1)}
-                        style={secondaryButtonStyle} // APLICAR: secondaryButtonStyle
+                        style={secondaryButtonStyle}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#777'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#555'}
                     >
@@ -55,7 +52,7 @@ const ContactForm = () => {
                     <Link
                         to="/home-podcasts"
                         style={{
-                            ...primaryButtonStyle, // APLICAR: primaryButtonStyle
+                            ...primaryButtonStyle,
                             textDecoration: 'none',
                             textAlign: 'center'
                         }}
@@ -80,7 +77,7 @@ const ContactForm = () => {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
-                            style={formInputStyle} // APLICAR: formInputStyle
+                            style={formInputStyle}
                         />
                     </div>
                     <div>
@@ -91,7 +88,7 @@ const ContactForm = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            style={formInputStyle} // APLICAR: formInputStyle
+                            style={formInputStyle}
                         />
                     </div>
                     <div>
@@ -102,13 +99,13 @@ const ContactForm = () => {
                             onChange={(e) => setMessage(e.target.value)}
                             rows="5"
                             required
-                            style={formInputStyle} // APLICAR: formInputStyle
+                            style={formInputStyle}
                         ></textarea>
                     </div>
                     <button
                         type="submit"
                         disabled={loading}
-                        style={primaryButtonStyle} // APLICAR: primaryButtonStyle
+                        style={primaryButtonStyle}
                     >
                         {loading ? 'Enviando...' : 'Enviar Mensaje'}
                     </button>

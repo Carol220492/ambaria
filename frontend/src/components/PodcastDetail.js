@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import NavBar from './NavBar';
+// ELIMINA ESTA LÍNEA: import NavBar from './NavBar';
 import audioPlayerStore from '../store/useAudioPlayerStore';
 import { AuthContext } from '../context/AuthContext';
 // IMPORTAR ESTILOS COMUNES
@@ -89,7 +89,7 @@ const PodcastDetail = () => {
 
     const token = localStorage.getItem('jwt_token');
     if (!token) {
-      setError('Debes iniciar sesión para comentar.');
+      alert('Debes iniciar sesión para comentar.'); // NOTA: Considera reemplazar alert con un modal custom.
       setCommentLoading(false);
       return;
     }
@@ -124,7 +124,7 @@ const PodcastDetail = () => {
   const handleDeleteComment = async (commentId) => {
     const token = localStorage.getItem('jwt_token');
     if (!token) {
-      alert('No estás autenticado para eliminar comentarios.');
+      alert('No estás autenticado para eliminar comentarios.'); // NOTA: Considera reemplazar alert con un modal custom.
       return;
     }
 
@@ -138,30 +138,28 @@ const PodcastDetail = () => {
         });
         console.log("DEBUG PODCAST DETAIL: Comentario eliminado:", commentId);
         setComments(comments.filter(comment => comment.id !== commentId));
-        alert('Comentario eliminado con éxito.');
+        alert('Comentario eliminado con éxito.'); // NOTA: Considera reemplazar alert con un modal custom.
       } catch (err) {
         console.error('Error al eliminar comentario:', err.response?.data || err.message);
-        alert(`Error al eliminar comentario: ${err.response?.data?.error || 'Error desconocido'}`);
+        alert(`Error al eliminar comentario: ${err.response?.data?.error || 'Error desconocido'}`); // NOTA: Considera reemplazar alert con un modal custom.
       }
     }
   };
 
 
   if (loading) {
-    // APLICAR: pageContainerStyle para el div externo
     return (
       <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>
-        <NavBar />
+        {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
         <p>Cargando detalles del podcast...</p>
       </div>
     );
   }
 
   if (error && !podcast) {
-    // APLICAR: pageContainerStyle para el div externo
     return (
       <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
-        <NavBar />
+        {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
         <p>{error}</p>
         <button onClick={() => navigate('/home-podcasts')} style={primaryButtonStyle}>Volver</button>
       </div>
@@ -169,10 +167,9 @@ const PodcastDetail = () => {
   }
 
   if (!podcast) {
-    // APLICAR: pageContainerStyle para el div externo
     return (
       <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>
-        <NavBar />
+        {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
         <p>No se encontraron detalles para este podcast.</p>
         <button onClick={() => navigate('/home-podcasts')} style={primaryButtonStyle}>Volver</button>
       </div>
@@ -180,16 +177,13 @@ const PodcastDetail = () => {
   }
 
   return (
-    // APLICAR: pageContainerStyle al div más externo para un fondo transparente
     <div style={pageContainerStyle}>
-      <NavBar />
-      {/* APLICAR: contentBoxStyle al div que contiene el contenido principal */}
+      {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
       <div style={{ ...contentBoxStyle, maxWidth: '800px' }}>
-        {/* Botones de navegación usando estilos comunes */}
         <div style={{ alignSelf: 'flex-start', marginBottom: '20px', display: 'flex', gap: '10px' }}>
             <button
                 onClick={() => navigate(-1)}
-                style={secondaryButtonStyle} // APLICAR: secondaryButtonStyle
+                style={secondaryButtonStyle}
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#777'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#555'}
             >
@@ -198,7 +192,7 @@ const PodcastDetail = () => {
             <Link
                 to="/home-podcasts"
                 style={{
-                    ...primaryButtonStyle, // APLICAR: primaryButtonStyle
+                    ...primaryButtonStyle,
                     textDecoration: 'none',
                     textAlign: 'center'
                 }}
@@ -208,7 +202,6 @@ const PodcastDetail = () => {
                 🏠 Home
             </Link>
         </div>
-        {/* FIN NUEVOS BOTONES DE NAVEGACIÓN */}
 
         {podcast.cover_image_url && (
           <img
@@ -229,12 +222,11 @@ const PodcastDetail = () => {
         <p style={{ lineHeight: '1.6', textAlign: 'center', marginBottom: '20px' }}>{podcast.description}</p>
 
         <button
-          onClick={() => audioPlayerStore.getState().playPodcast(podcast)} // Llamada directa a la acción del store
-          // APLICAR: primaryButtonStyle y sobrescribir color/padding/fontSize
+          onClick={() => audioPlayerStore.getState().playPodcast(podcast)}
           style={{
             ...primaryButtonStyle,
             backgroundColor: '#cc00cc',
-            padding: '12px 25px', // Botón un poco más grande
+            padding: '12px 25px',
             fontSize: '1.1em',
             marginBottom: '30px'
           }}
@@ -244,19 +236,16 @@ const PodcastDetail = () => {
           Reproducir Podcast
         </button>
 
-        {/* SECCIÓN DE COMENTARIOS */}
         <div style={{ width: '100%', marginTop: '30px', borderTop: '1px solid #444', paddingTop: '20px' }}>
           <h2 style={{ color: '#8AFFD2', marginBottom: '20px', textAlign: 'center' }}>Comentarios</h2>
 
-          {/* Formulario para añadir un comentario */}
-          {user && ( // Solo mostrar el formulario si hay un usuario autenticado
+          {user && (
             <form onSubmit={handleAddComment} style={{ marginBottom: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <textarea
                 value={newCommentText}
                 onChange={(e) => setNewCommentText(e.target.value)}
                 placeholder="Escribe tu comentario aquí..."
                 rows="4"
-                // APLICAR: formInputStyle y sobrescribir el ancho/margen/resize
                 style={{
                   ...formInputStyle, 
                   width: '90%', 
@@ -267,7 +256,6 @@ const PodcastDetail = () => {
               <button
                 type="submit"
                 disabled={commentLoading || !newCommentText.trim()}
-                // APLICAR: primaryButtonStyle y sobrescribir el color de fondo y cursor
                 style={{
                   ...primaryButtonStyle,
                   backgroundColor: commentLoading || !newCommentText.trim() ? '#666' : '#007bff',
@@ -285,14 +273,13 @@ const PodcastDetail = () => {
             <p style={{ textAlign: 'center', color: '#bbb' }}>Inicia sesión para poder comentar.</p>
           )}
 
-          {/* Lista de comentarios */}
           {comments.length === 0 ? (
             <p style={{ textAlign: 'center', color: '#bbb' }}>Sé el primero en comentar este podcast.</p>
           ) : (
             <div style={{ width: '100%' }}>
               {comments.map((comment) => (
                 <div key={comment.id} style={{
-                  backgroundColor: '#4a4f57', // Estilo específico para cada comentario
+                  backgroundColor: '#4a4f57',
                   borderRadius: '8px',
                   padding: '15px',
                   marginBottom: '15px',
@@ -326,7 +313,6 @@ const PodcastDetail = () => {
                   {user && String(user.user_id) === String(comment.user_id) && (
                     <button
                       onClick={() => handleDeleteComment(comment.id)}
-                      // APLICAR: Un estilo de botón de peligro simplificado, o usar dangerButtonStyle
                       style={{
                         background: 'none',
                         border: 'none',
