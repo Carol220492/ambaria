@@ -1,6 +1,3 @@
-// frontend/src/styles/commonStyles.js
-
-// Estilo para el contenedor principal de la página (el que debe ser transparente para ver el fondo)
 export const pageContainerStyle = {
   backgroundColor: 'transparent', // Crucial para ver el VideoBackground
   minHeight: '100vh',

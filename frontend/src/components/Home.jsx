@@ -1,12 +1,12 @@
 // frontend/src/components/Home.js
 import React from 'react';
 import { /* useNavigate, */ Link } from 'react-router-dom'; // Eliminamos useNavigate de la importación
-import { pageContainerStyle, primaryButtonStyle } from '../styles/commonStyles';
+import { pageContainerStyle, primaryButtonStyle } from '../styles/commonStyles.jsx';
 
 const Home = () => {
     // const navigate = useNavigate(); // Ya no es necesario si no se usa para navegación programática
 
-    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     const handleGoogleLogin = () => {
         window.location.href = `${API_URL}/auth/google`;

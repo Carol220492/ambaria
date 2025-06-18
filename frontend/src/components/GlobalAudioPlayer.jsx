@@ -1,6 +1,6 @@
 // frontend/src/components/GlobalAudioPlayer.js
 import React, { useRef, useEffect, useState } from 'react';
-import audioPlayerStore from '../store/useAudioPlayerStore';
+import audioPlayerStore from '../store/useAudioPlayerStore.jsx';
 import { FaPlay, FaPause } from 'react-icons/fa';
 
 const GlobalAudioPlayer = () => {

@@ -1,8 +1,7 @@
 // frontend/src/components/UploadPodcast.js
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-// ELIMINA ESTA LÍNEA: import NavBar from './NavBar'; // <--- ¡ASEGÚRATE DE QUE ESTA LÍNEA NO ESTÉ!
-import { pageContainerStyle, contentBoxStyle, formInputStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles';
+import { pageContainerStyle, contentBoxStyle, formInputStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles.jsx';
 
 const UploadPodcast = () => {
     const navigate = useNavigate();
@@ -15,7 +14,7 @@ const UploadPodcast = () => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
 
-    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     const handleFileChange = (e) => {
         const { name, files } = e.target;

@@ -1,8 +1,7 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-// Importar estilos comunes para los botones
-import { primaryButtonStyle, dangerButtonStyle } from '../styles/commonStyles'; 
+import { AuthContext } from '../context/AuthContext.jsx';
+import { primaryButtonStyle, dangerButtonStyle } from '../styles/commonStyles.jsx'; 
 
 const NavBar = () => {
   const navigate = useNavigate();

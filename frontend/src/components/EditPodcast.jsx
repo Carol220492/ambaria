@@ -4,7 +4,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 // ELIMINA ESTA LÍNEA: import NavBar from './NavBar';
 // IMPORTAR ESTILOS COMUNES
-import { pageContainerStyle, contentBoxStyle, formInputStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles';
+import { pageContainerStyle, contentBoxStyle, formInputStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles.jsx';
 
 const EditPodcast = () => {
     const { id } = useParams();
@@ -19,7 +19,7 @@ const EditPodcast = () => {
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
 
-    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     useEffect(() => {
         const fetchPodcastData = async () => {

@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-// ELIMINA ESTA LÍNEA: import NavBar from './NavBar';
-import audioPlayerStore from '../store/useAudioPlayerStore';
-import { AuthContext } from '../context/AuthContext';
-// IMPORTAR ESTILOS COMUNES
-import { pageContainerStyle, contentBoxStyle, primaryButtonStyle, secondaryButtonStyle, formInputStyle } from '../styles/commonStyles';
+import audioPlayerStore from '../store/useAudioPlayerStore.jsx';
+import { AuthContext } from '../context/AuthContext.jsx';
+import { pageContainerStyle, contentBoxStyle, primaryButtonStyle, secondaryButtonStyle, formInputStyle } from '../styles/commonStyles.jsx';
 
 const PodcastDetail = () => {
   const { id } = useParams();
@@ -18,7 +16,7 @@ const PodcastDetail = () => {
   const [newCommentText, setNewCommentText] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const fetchPodcastDetails = async () => {

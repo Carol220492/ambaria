@@ -1,18 +1,18 @@
 // frontend/src/App.js
 
 import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-router-dom';
-import Home from './components/Home'; // Esto es tu LoginPage
-import Profile from './components/Profile';
-import AuthHandler from './components/AuthHandler';
-import HomePodcasts from './components/HomePodcasts';
-import UploadPodcast from './components/UploadPodcast';
-import NavBar from './components/NavBar'; // <-- Importa NavBar aquí
-import PodcastDetail from './components/PodcastDetail';
-import ContactForm from './components/ContactForm';
-import GlobalAudioPlayer from './components/GlobalAudioPlayer';
-import EditPodcast from './components/EditPodcast';
-import { AuthProvider } from './context/AuthContext';
-import VideoBackground from './components/VideoBackground';
+import Home from './components/Home.jsx'; // Esto es tu LoginPage
+import Profile from './components/Profile.jsx';
+import AuthHandler from './components/AuthHandler.jsx';
+import HomePodcasts from './components/HomePodcasts.jsx';
+import UploadPodcast from './components/UploadPodcast.jsx';
+import NavBar from './components/NavBar.jsx'; // <-- Importa NavBar aquí
+import PodcastDetail from './components/PodcastDetail.jsx';
+import ContactForm from './components/ContactForm.jsx';
+import GlobalAudioPlayer from './components/GlobalAudioPlayer.jsx';
+import EditPodcast from './components/EditPodcast.jsx';
+import { AuthProvider } from './context/AuthContext.jsx';
+import VideoBackground from './components/VideoBackground.jsx';
 
 const PrivateRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('jwt_token');

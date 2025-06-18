@@ -2,9 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// ELIMINA ESTA LÍNEA: import NavBar from './NavBar';
-import audioPlayerStore from '../store/useAudioPlayerStore';
-import { pageContainerStyle, contentBoxStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles';
+import audioPlayerStore from '../store/useAudioPlayerStore.jsx';
+import { pageContainerStyle, contentBoxStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles.jsx';
 
 const HomePodcasts = () => {
   const [podcasts, setPodcasts] = useState([]);
@@ -18,7 +17,7 @@ const HomePodcasts = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   // Efecto para obtener PODCASTS (ahora con filtro de categoría)
   useEffect(() => {
@@ -107,7 +106,6 @@ const HomePodcasts = () => {
 
   return (
     <div style={pageContainerStyle}>
-      {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
       <div style={{ ...contentBoxStyle, maxWidth: '1200px' }}>
         <h1 style={{ color: '#00FFFF', marginBottom: '20px', textAlign: 'center' }}>Explorar Podcasts</h1>
 

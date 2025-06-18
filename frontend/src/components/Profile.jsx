@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-// IMPORTAR ESTILOS COMUNES
-import { pageContainerStyle, contentBoxStyle, primaryButtonStyle, secondaryButtonStyle, dangerButtonStyle } from '../styles/commonStyles';
+import { pageContainerStyle, contentBoxStyle, primaryButtonStyle, secondaryButtonStyle, dangerButtonStyle } from '../styles/commonStyles.jsx';
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
@@ -15,7 +14,7 @@ const Profile = () => {
   const [podcastLoading, setPodcastLoading] = useState(true);
   const [podcastError, setPodcastError] = useState(null);
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const token = localStorage.getItem('jwt_token');
