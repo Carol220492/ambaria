@@ -88,7 +88,6 @@ const HomePodcasts = () => {
   if (loading && podcasts.length === 0) {
     return (
       <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>
-        {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
         <p>Cargando podcasts...</p>
       </div>
     );
@@ -97,7 +96,6 @@ const HomePodcasts = () => {
   if (error) {
     return (
       <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
-        {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
         <p>{error}</p>
         <button onClick={() => navigate('/')} style={primaryButtonStyle}>Volver a Iniciar Sesión</button>
       </div>
