@@ -1,7 +1,7 @@
 from flask import Blueprint, request, render_template, current_app, jsonify
 from werkzeug.utils import secure_filename
-from ..models.podcast import Podcast
-from ..app import db  # Importamos db desde app.py
+from models.podcast import Podcast
+from app import db  # Importamos db desde app.py
 from os import path,  remove
 from sqlalchemy.exc import SQLAlchemyError  # Importamos la excepción de SQLAlchemy
 import os
