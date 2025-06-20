@@ -1,6 +1,6 @@
 # backend/models/user.py
 
-from backend.extensions import db
+from extensions import db
 from sqlalchemy.orm import relationship # ¡Importa esto!
 from datetime import datetime # ¡Importa esto!
 

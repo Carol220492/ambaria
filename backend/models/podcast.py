@@ -1,6 +1,6 @@
 # backend/models/podcast.py
 
-from backend.extensions import db
+from extensions. import db
 from sqlalchemy.orm import relationship
 from datetime import datetime # ¡Asegúrate de que esta importación exista si usas datetime.utcnow()!
 

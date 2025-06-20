@@ -1,6 +1,6 @@
 # backend/models/comment.py
 from datetime import datetime
-from backend.extensions import db
+from extensions import db
 
 class Comment(db.Model):
     __tablename__ = 'comments'  # Nombre de la tabla en la base de datos

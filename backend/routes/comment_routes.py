@@ -1,10 +1,10 @@
 # backend/routes/comment_routes.py
 from flask import Blueprint, jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from backend.extensions import db
-from backend.models.comment import Comment
-from backend.models.podcast import Podcast
-from backend.models.user import User # Necesario para la relación inversa y obtener nombre de usuario
+from extensions import db
+from models.comment import Comment
+from models.podcast import Podcast
+from models.user import User # Necesario para la relación inversa y obtener nombre de usuario
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime # Asegúrate de que datetime esté importado si lo usas directamente
 

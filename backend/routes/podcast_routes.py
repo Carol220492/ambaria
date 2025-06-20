@@ -2,9 +2,9 @@ from flask import Blueprint, jsonify, request, session, current_app, send_from_d
 from werkzeug.utils import secure_filename
 import os
 
-from backend.models.podcast import Podcast
-from backend.models.user import User # Asegúrate de que User esté importado si lo necesitas en otras rutas
-from backend.extensions import db
+from models.podcast import Podcast
+from models.user import User # Asegúrate de que User esté importado si lo necesitas en otras rutas
+from extensions import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from sqlalchemy.orm.exc import NoResultFound
