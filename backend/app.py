@@ -9,18 +9,18 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import urllib.parse # <-- NUEVA IMPORTACIÓN!
-from config import Config
+from config import Config # CORRECTO: Importación directa de config
 
 load_dotenv() # Cargar variables de entorno al iniciar la aplicación
 
-from backend.extensions import db
-from backend.models.user import User
-# from backend.models.podcast import Podcast # Puedes quitar esto si no lo usas directamente aquí
-from backend.models.comment import Comment # <--- ¡NUEVA IMPORTACIÓN!
+from extensions import db # <-- ¡CORREGIDO! Quitado 'backend.'
+from models.user import User # <-- ¡CORREGIDO! Quitado 'backend.'
+# from models.podcast import Podcast # Puedes quitar esto si no lo usas directamente aquí
+from models.comment import Comment # <-- ¡CORREGIDO! Quitado 'backend.'
 
-from backend.routes.upload_routes import upload_bp
-from backend.routes.podcast_routes import podcast_bp
-from backend.routes.comment_routes import comment_bp # <--- ¡NUEVA IMPORTACIÓN!
+from routes.upload_routes import upload_bp # <-- ¡CORREGIDO! Quitado 'backend.'
+from routes.podcast_routes import podcast_bp # <-- ¡CORREGIDO! Quitado 'backend.'
+from routes.comment_routes import comment_bp # <-- ¡CORREGIDO! Quitado 'backend.'
 
 app = Flask(__name__)
 app.config.from_object(Config) # Cambiado de from_pyfile a from_object
@@ -40,6 +40,16 @@ migrate = Migrate(app, db)
 
 jwt = JWTManager(app)
 
+# ==========================================================
+# CÓDIGO PARA INICIALIZAR LA BASE DE DATOS EN RENDER (PostgreSQL)
+# Esto creará las tablas si no existen. Es seguro ejecutarlo.
+# ==========================================================
+with app.app_context():
+    db.create_all()
+    print("DEBUG APP: Database tables checked/created.")
+# ==========================================================
+
+
 # Configuración de Google OAuth 2.0 (obtenidas de la Consola de Google Cloud)
 app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
 app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET')
@@ -47,11 +57,13 @@ app.config['GOOGLE_AUTHORIZE_URL'] = 'https://accounts.google.com/o/oauth2/auth'
 app.config['GOOGLE_TOKEN_URL'] = 'https://oauth2.googleapis.com/token'
 app.config['GOOGLE_USERINFO_URL'] = 'https://www.googleapis.com/oauth2/v1/userinfo'
 app.config['GOOGLE_REDIRECT_URI'] = os.environ.get('GOOGLE_REDIRECT_URI') or 'http://localhost:5000/auth/google/callback'
+# IMPORTANTE: En Render, esta URL deberá coincidir con la Public URL de tu backend + /auth/google/callback
+# Ejemplo: https://ambaria-backend-xxxx.onrender.com/auth/google/callback
 
 # Registrar Blueprints
 app.register_blueprint(upload_bp)
 app.register_blueprint(podcast_bp)
-app.register_blueprint(comment_bp) # <--- ¡NUEVO REGISTRO!
+app.register_blueprint(comment_bp)
 
 # --- Rutas de Autenticación con Google OAuth ---
 @app.route('/auth/google')
