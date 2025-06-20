@@ -9,7 +9,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import urllib.parse # <-- NUEVA IMPORTACIÓN!
-from backend.config import Config # Añade esta línea
+from config import Config
 
 load_dotenv() # Cargar variables de entorno al iniciar la aplicación
 
