@@ -44,3 +44,5 @@ uritemplate==4.2.0
 urllib3==2.4.0
 Werkzeug==2.3.8
 zipp==3.22.0
+gunicorn
+psycopg2-binary
