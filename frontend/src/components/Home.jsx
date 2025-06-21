@@ -14,8 +14,8 @@ const Home = () => {
 
     return (
         <div style={{ ...pageContainerStyle, justifyContent: 'center' }}>
-            <h1 style={{ color: '#00FFFF', fontSize: '3em', marginBottom: '20px' }}>Bienvenido a Ambaria</h1>
-            <p style={{ fontSize: '1.1em', marginBottom: '30px' }}>Tu plataforma para explorar y compartir podcasts.</p>
+            <h1 style={{ color: '#00FFFF', fontSize: '3em', marginBottom: '20px' }}>Bienvenida a Ambaria</h1>
+            <p style={{ fontSize: '1.1em', marginBottom: '30px' }}>Tribu de Historias</p>
 
             <button
                 onClick={handleGoogleLogin}
