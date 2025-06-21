@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;700&display=swap');
 /* Mantengo Cinzel y Montserrat por ahora, pero la fuente del logo es crucial */
 
+/* ESTILOS EXISTENTES: Respetados */
 body {
   margin: 0;
   font-family: 'Montserrat', sans-serif; /* Fuente por defecto */
@@ -9,13 +10,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden; /* Evitar scroll horizontal */
   
- background-image: url('./assets/ambaria.mp4'); /* Ruta a tu imagen */
+  background-image: url('./assets/ambaria.mp4'); /* Ruta a tu imagen */
   background-size: cover; /* Cubre toda la pantalla sin distorsionar */
   background-position: center center; /* Centra la imagen */
   background-attachment: fixed; /* Mantiene la imagen fija al hacer scroll */
   background-repeat: no-repeat; /* Evita que la imagen se repita */
 
-   min-height: 100vh;
+  min-height: 100vh;
   color: rgba(255, 255, 255, 0.8);
 }
 
@@ -24,7 +25,7 @@ code {
     monospace;
 }
 
-/* Estilos de scrollbar con la nueva paleta */
+/* Estilos de scrollbar con la nueva paleta (EXISTENTES: Respetados) */
 ::-webkit-scrollbar {
     width: 10px;
 }
@@ -40,4 +41,137 @@ code {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #00FFFF; /* Turquesa brillante */
+}
+
+/* ===================================================== */
+/* NUEVOS ESTILOS RESPONSIVOS GLOBALES (AÑADIDOS AQUÍ) */
+/* ===================================================== */
+
+/* Reseteo básico para asegurar que el padding y border se incluyan en el ancho/alto */
+html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+/* Contenedor principal de la aplicación React */
+/* Este div es el que envuelve todo el contenido dentro de tu App.jsx.
+   Ya tiene padding-top en App.jsx para el Navbar fijo. */
+.App {
+    display: flex;
+    flex-direction: column;
+    /* min-height ya está en body, pero lo reforzamos aquí si es necesario */
+    min-height: 100vh;
+}
+
+/* Reglas generales para imágenes fluidas */
+img {
+    max-width: 100%; /* Las imágenes nunca desbordarán su contenedor */
+    height: auto;    /* Mantienen su proporción */
+    display: block;  /* Elimina espacios extra debajo de las imágenes */
+}
+
+/* ----------------------------------------------------- */
+/* MEDIA QUERIES PARA RESPONSIVIDAD */
+/* (Diseño Móvil Primero: los estilos fuera de @media son para móviles) */
+/* ----------------------------------------------------- */
+
+/* Estilos por defecto para MÓVILES (Ancho de pantalla hasta 767px) */
+/* Estos estilos se aplican a pantallas pequeñas. */
+
+/* Ajustes de tamaño de fuente para pantallas pequeñas */
+h1 {
+    font-size: 2.2em; /* Más pequeño en móvil */
+}
+
+h2 {
+    font-size: 1.8em;
+}
+
+p {
+    font-size: 0.9em;
+}
+
+/* Ajustes de padding para contenedores de página en móvil */
+/* Debes añadir la clase 'page-container' a los divs principales de tus componentes (Home.jsx, Profile.jsx, etc.) */
+.page-container {
+    padding: 20px; /* Menos padding en los lados para móviles */
+    width: 100%; /* Asegura que ocupe todo el ancho disponible en móvil */
+    max-width: 100%; /* No se desborde */
+}
+
+/* Botones: más compactos en móvil */
+button {
+    padding: 10px 20px;
+    font-size: 1em;
+}
+
+/* Contenedores flexibles que se apilan en móvil */
+/* Añade esta clase 'flex-container-responsive' a los divs que contienen elementos que quieres que se apilen verticalmente en móvil */
+.flex-container-responsive {
+    flex-direction: column; /* Apila los elementos verticalmente */
+    align-items: center;    /* Centra los elementos al apilarse */
+    gap: 20px;              /* Espacio entre elementos apilados */
+}
+
+/* Media Query para TABLETS (Ancho mínimo de 768px y máximo de 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    h1 {
+        font-size: 2.8em;
+    }
+    h2 {
+        font-size: 2.2em;
+    }
+    p {
+        font-size: 1em;
+    }
+    .page-container {
+        padding: 40px; /* Más padding en tablets */
+    }
+    .flex-container-responsive {
+        flex-direction: row; /* Vuelven a la fila */
+        justify-content: space-around; /* Distribuye los elementos */
+    }
+    button {
+        padding: 12px 25px;
+        font-size: 1.1em;
+    }
+}
+
+/* Media Query para ESCRITORIO (Ancho mínimo de 1024px) */
+@media (min-width: 1024px) {
+    h1 {
+        font-size: 3.5em; /* Tamaño completo para escritorio */
+    }
+    h2 {
+        font-size: 2.5em;
+    }
+    p {
+        font-size: 1.1em;
+    }
+    .page-container {
+        padding: 60px 80px; /* Más padding en escritorio */
+        max-width: 1200px; /* Opcional: limita el ancho máximo en pantallas muy grandes */
+        margin: 0 auto; /* Centra el contenedor en pantallas grandes */
+    }
+    .flex-container-responsive {
+        flex-direction: row; /* Mantienen la fila */
+        justify-content: space-between; /* Espacio entre los elementos */
+    }
+    button {
+        padding: 15px 30px;
+        font-size: 1.2em;
+    }
+}
+
+/* Estilos específicos para el audio player si lo necesitas ajustar en móviles */
+/* Por ejemplo, si tu GlobalAudioPlayer tiene la clase 'global-audio-player': */
+@media (max-width: 768px) {
+    .global-audio-player { 
+        width: 95%;
+        bottom: 10px;
+        left: 2.5%;
+        right: 2.5%;
+    }
 }
