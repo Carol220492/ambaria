@@ -83,7 +83,6 @@ const HomePodcasts = () => {
   };
 
   if (loading && podcasts.length === 0) {
-    // AÑADIDO: className="main-content-wrapper" para centrado responsivo
     return (
       <div className="main-content-wrapper" style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>
         <p>Cargando podcasts...</p>
@@ -92,7 +91,6 @@ const HomePodcasts = () => {
   }
 
   if (error) {
-    // AÑADIDO: className="main-content-wrapper" para centrado responsivo
     return (
       <div className="main-content-wrapper" style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
         <p>{error}</p>
@@ -102,22 +100,15 @@ const HomePodcasts = () => {
   }
 
   return (
-    // AÑADIDO: className="main-content-wrapper" al div principal.
-    // pageContainerStyle se mantiene para los estilos específicos que ya tenías.
     <div className="main-content-wrapper" style={pageContainerStyle}>
-      {/* contentBoxStyle ya tiene max-width. Lo ajustamos para que no desborde en móvil. */}
       <div style={{ ...contentBoxStyle, width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
         <h1 style={{ color: '#00FFFF', marginBottom: '20px', textAlign: 'center' }}>Explorar Podcasts</h1>
 
-        {/* --- CARRUSEL DE CATEGORÍAS (flex-container-responsive para apilar en móvil) --- */}
-        {/* Aquí usaremos la clase flex-container-responsive para que se apile en móvil */}
         <div className="flex-container-responsive" style={{
-          overflowX: 'auto', // Permite scroll horizontal si las categorías son muchas
-          whiteSpace: 'nowrap', // Mantiene los elementos en una sola línea hasta que se apilen
+          overflowX: 'auto',
+          whiteSpace: 'nowrap',
           paddingBottom: '10px',
           marginBottom: '30px',
-          /* Los estilos de display, flex-direction, gap, justifyContent, alignItems
-             se manejarán por la clase 'flex-container-responsive' en index.css */
         }}>
           {categories.map((category) => (
             <button
@@ -130,9 +121,9 @@ const HomePodcasts = () => {
                 padding: '8px 15px',
                 borderRadius: '20px',
                 cursor: 'pointer',
-                flexShrink: 0, // Evita que los botones se encojan
-                minWidth: 'auto', // Permite que el ancho del botón se ajuste a su contenido
-                margin: '5px' // Añade un pequeño margen entre botones
+                flexShrink: 0,
+                minWidth: 'auto',
+                margin: '5px'
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = selectedCategory === category ? '#0056b3' : '#777'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = selectedCategory === category ? '#007bff' : '#555'}
@@ -141,17 +132,13 @@ const HomePodcasts = () => {
             </button>
           ))}
         </div>
-        {/* --- FIN CARRUSEL DE CATEGORÍAS --- */}
 
-        {/* GRID DE PODCASTS: Ajustado para ser responsivo */}
         <div style={{ 
             display: 'grid', 
-            // Usa auto-fit y un minmax más pequeño para móvil para permitir más columnas
-            // minmax(150px, 1fr) -> cada columna tendrá mínimo 150px, si hay espacio, crecerá
             gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
-            gap: '20px', // Espacio entre tarjetas
-            justifyContent: 'center', // Centrar la cuadrícula si hay pocas columnas
-            alignItems: 'stretch' // Asegura que las tarjetas tengan la misma altura si están en fila
+            gap: '20px', 
+            justifyContent: 'center', 
+            alignItems: 'stretch' 
         }}>
           {podcasts.length === 0 && !loading ? (
             <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#ccc' }}>No se encontraron podcasts para esta categoría.</p>
@@ -174,21 +161,23 @@ const HomePodcasts = () => {
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
               >
-                {podcast.cover_image_url && (
-                  <img
-                    src={podcast.cover_image_url}
-                    alt={podcast.title}
-                    style={{
-                      width: '100%', // Asegura que la imagen sea fluida dentro de su contenedor
-                      height: 'auto', // Mantiene la proporción
-                      maxHeight: '180px', // Limita la altura para que no sean demasiado grandes en móvil
-                      objectFit: 'cover',
-                      borderRadius: '8px',
-                      marginBottom: '15px',
-                      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)'
-                    }}
-                  />
-                )}
+                {/* INICIO: CÓDIGO MEJORADO PARA IMAGENES */}
+                {console.log(`DEBUG IMAGEN HomePodcasts: URL para ${podcast.title}: ${podcast.cover_image_url}`)}
+                <img
+                  src={podcast.cover_image_url || 'https://placehold.co/180x180/424242/ffffff?text=No+Image'} // Fallback
+                  alt={podcast.title}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '180px',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    marginBottom: '15px',
+                    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)'
+                  }}
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/180x180/424242/ffffff?text=Error+Loading'; }} // Fallback en error
+                />
+                {/* FIN: CÓDIGO MEJORADO PARA IMAGENES */}
                 <h3 style={{ color: '#00FFFF', fontSize: '1.4em', margin: '10px 0' }}>{podcast.title}</h3>
                 <p style={{ color: '#ccc', fontSize: '1em', margin: '0 0 10px 0' }}>Artista: {podcast.artist}</p>
                 <p style={{ color: '#aaa', fontSize: '0.9em', margin: '0 0 15px 0', maxHeight: '80px', overflow: 'hidden' }}>{podcast.description}</p>

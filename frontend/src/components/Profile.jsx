@@ -166,9 +166,10 @@ const Profile = () => {
   }
 
   return (
-    // AÑADIDO: className="main-content-wrapper" al div principal
     <div className="main-content-wrapper" style={pageContainerStyle}>
-      <div style={{ ...contentBoxStyle, width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
+      {/* ¡ESTO ES CRÍTICO! Aquí SOLO aplicamos contentBoxStyle. */}
+      {/* NO AÑADIR NINGÚN width, maxWidth o margin extra aquí en línea. */}
+      <div style={contentBoxStyle}>
         <h1 style={{ color: '#00FFFF', marginBottom: '20px' }}>Mi Perfil</h1>
 
         <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
@@ -213,10 +214,10 @@ const Profile = () => {
         ) : (
           <div style={{ 
               display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', // Ajuste para móvil: min 150px, máx 1fr
-              gap: '20px', // Espacio entre tarjetas
-              justifyContent: 'center', // Centrar la cuadrícula si hay pocas columnas
-              alignItems: 'stretch' // Asegura que las tarjetas tengan la misma altura
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+              gap: '20px', 
+              justifyContent: 'center', 
+              alignItems: 'stretch' 
           }}>
             {userPodcasts.map((podcast) => (
               <div key={podcast.id} style={{
@@ -229,20 +230,22 @@ const Profile = () => {
                 alignItems: 'center',
                 textAlign: 'center'
               }}>
-                {podcast.cover_image_url && (
-                  <img
-                    src={podcast.cover_image_url}
-                    alt={podcast.title}
-                    style={{
-                      width: '100%',
-                      height: 'auto',
-                      maxHeight: '150px', // Limita la altura para móvil
-                      objectFit: 'cover',
-                      borderRadius: '4px',
-                      marginBottom: '10px'
-                    }}
-                  />
-                )}
+                {/* INICIO: CÓDIGO MEJORADO PARA IMAGENES */}
+                {console.log(`DEBUG IMAGEN Profile: URL para ${podcast.title}: ${podcast.cover_image_url}`)}
+                <img
+                  src={podcast.cover_image_url || 'https://placehold.co/150x150/424242/ffffff?text=No+Image'} // Fallback
+                  alt={podcast.title}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '150px',
+                    objectFit: 'cover',
+                    borderRadius: '4px',
+                    marginBottom: '10px'
+                  }}
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/150x150/424242/ffffff?text=Error+Loading'; }} // Fallback en error
+                />
+                {/* FIN: CÓDIGO MEJORADO PARA IMAGENES */}
                 <h3 style={{ color: '#00FFFF', fontSize: '1.2em', margin: '10px 0' }}>{podcast.title}</h3>
                 <p style={{ color: '#ccc', fontSize: '0.9em', margin: '0 0 10px 0' }}>Artista: {podcast.artist}</p>
                 <p style={{ color: '#aaa', fontSize: '0.8em', margin: '0 0 15px 0', maxHeight: '60px', overflow: 'hidden' }}>{podcast.description}</p>

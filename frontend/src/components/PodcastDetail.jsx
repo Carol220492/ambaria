@@ -147,8 +147,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   if (loading) {
     return (
-      <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>
-        {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
+      <div className="main-content-wrapper" style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>
         <p>Cargando detalles del podcast...</p>
       </div>
     );
@@ -156,8 +155,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   if (error && !podcast) {
     return (
-      <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
-        {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
+      <div className="main-content-wrapper" style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
         <p>{error}</p>
         <button onClick={() => navigate('/home-podcasts')} style={primaryButtonStyle}>Volver</button>
       </div>
@@ -166,8 +164,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   if (!podcast) {
     return (
-      <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>
-        {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
+      <div className="main-content-wrapper" style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>
         <p>No se encontraron detalles para este podcast.</p>
         <button onClick={() => navigate('/home-podcasts')} style={primaryButtonStyle}>Volver</button>
       </div>
@@ -175,10 +172,11 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   }
 
   return (
-    <div style={pageContainerStyle}>
-      {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
-      <div style={{ ...contentBoxStyle, maxWidth: '800px' }}>
-        <div style={{ alignSelf: 'flex-start', marginBottom: '20px', display: 'flex', gap: '10px' }}>
+    <div className="main-content-wrapper" style={pageContainerStyle}>
+      {/* ¡ESTO ES CRÍTICO! Aquí SOLO aplicamos contentBoxStyle. */}
+      {/* NO AÑADIR NINGÚN width, maxWidth o margin extra aquí en línea. */}
+      <div style={contentBoxStyle}>
+        <div style={{ alignSelf: 'flex-start', marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
             <button
                 onClick={() => navigate(-1)}
                 style={secondaryButtonStyle}
@@ -201,20 +199,22 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
             </Link>
         </div>
 
-        {podcast.cover_image_url && (
-          <img
-            src={podcast.cover_image_url}
-            alt={podcast.title}
-            style={{
-              width: '100%',
-              maxWidth: '300px',
-              height: 'auto',
-              borderRadius: '8px',
-              marginBottom: '20px',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
-            }}
-          />
-        )}
+        {/* INICIO: CÓDIGO MEJORADO PARA IMAGENES */}
+        {console.log(`DEBUG IMAGEN PodcastDetail: URL para ${podcast.title}: ${podcast.cover_image_url}`)}
+        <img
+          src={podcast.cover_image_url || 'https://placehold.co/300x300/424242/ffffff?text=No+Image'} // Fallback
+          alt={podcast.title}
+          style={{
+            width: '100%',
+            maxWidth: '300px', // Mantiene un tamaño máximo para desktop
+            height: 'auto',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+          }}
+          onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/300x300/424242/ffffff?text=Error+Loading'; }} // Fallback en error
+        />
+        {/* FIN: CÓDIGO MEJORADO PARA IMAGENES */}
         <h1 style={{ color: '#8AFFD2', marginBottom: '10px', textAlign: 'center' }}>{podcast.title}</h1>
         {podcast.artist && <p style={{ color: '#bbb', fontSize: '1.1em', marginBottom: '15px' }}>Artista: {podcast.artist}</p>}
         <p style={{ lineHeight: '1.6', textAlign: 'center', marginBottom: '20px' }}>{podcast.description}</p>

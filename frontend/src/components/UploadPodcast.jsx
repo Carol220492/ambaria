@@ -86,11 +86,9 @@ const UploadPodcast = () => {
     };
 
     return (
-        // El div principal ya tiene className="main-content-wrapper" y usa pageContainerStyle
         <div className="main-content-wrapper" style={pageContainerStyle}>
-            {/* CORRECCIÓN CLAVE AQUÍ: Hemos eliminado 'maxWidth: '100%', margin: '0 auto'' de aquí. */}
-            {/* Ahora contentBoxStyle desde commonStyles.jsx y la regla en index.css
-                controlarán el tamaño y el centrado de esta caja. */}
+            {/* ¡ESTO ES CRÍTICO! Aquí SOLO aplicamos contentBoxStyle. */}
+            {/* NO AÑADIR NINGÚN width, maxWidth o margin extra aquí en línea. */}
             <div style={contentBoxStyle}> 
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#00FFFF' }}>Subir Nuevo Podcast</h2>
 

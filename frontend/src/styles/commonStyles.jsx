@@ -7,20 +7,19 @@ export const pageContainerStyle = {
   backgroundColor: 'transparent', // Crucial para ver el VideoBackground
   color: 'white',
   fontFamily: 'Arial, sans-serif',
-  // minHeight, padding, paddingTop, display, flexDirection, alignItems: ¡manejados por index.css!
 };
 
 // Estilo para la caja de contenido central (la tarjeta que contiene el formulario/listado)
-// ¡CAMBIO CLAVE AQUÍ! Hacemos que el ancho sea 100% y el margen automático para que se centre.
-// El MAX-WIDTH se moverá al CSS global (index.css) para esta caja en escritorio,
-// y en móvil simplemente ocupará el 100% del contenedor padre.
+// ¡AHORA SÍ! Reintroducimos el maxWidth y el margin AQUÍ.
+// Esto hará que la caja sea pequeña y centrada en escritorio, y 100% de su padre en móvil.
 export const contentBoxStyle = {
-  width: '100%', // ¡Ocupa el 100% del espacio DISPONIBLE en su padre!
-  margin: '20px auto', // Centrar la caja horizontalmente
+  maxWidth: '800px', // <-- ¡IMPORTANTE! Limita el ancho de la caja en pantallas grandes
+  margin: '20px auto', // <-- ¡IMPORTANTE! Centra la caja horizontalmente
   padding: '30px', // Padding interno de la caja
   backgroundColor: 'rgba(42, 42, 74, 0.7)', // Fondo semi-transparente
   borderRadius: '10px',
   boxShadow: '0 0 15px rgba(0, 255, 255, 0.5)',
+  width: '100%', // Asegura que ocupe el ancho disponible en su padre (se ajustará al maxWidth si la pantalla es grande)
   boxSizing: 'border-box', // ¡MUY IMPORTANTE! Asegura que el padding no cause desbordamiento
 };
 

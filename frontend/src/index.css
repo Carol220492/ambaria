@@ -2,31 +2,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;700&display=swap');
 
 /* REINICIO UNIVERSAL Y BOX-SIZING: ¡ABSOLUTAMENTE CRÍTICO! */
-/* Esto asegura que el padding y el border se incluyan DENTRO del ancho/alto del elemento,
-   evitando desbordamientos y cálculos incorrectos. */
 html {
     box-sizing: border-box;
-    /* Aseguramos que HTML ocupe toda la altura visible */
     min-height: 100vh; 
-    height: 100%; /* Forzar altura para asegurar que el body la herede */
+    height: 100%;
     overflow-x: hidden; /* Asegura que el HTML no tenga scroll horizontal */
 }
 *, *:before, *:after {
     box-sizing: inherit;
-    /* Eliminamos CUALQUIER margen o padding por defecto de TODOS los elementos */
     margin: 0; 
     padding: 0;
 }
 
 /* ESTILOS DEL BODY: ¡La base de tu fondo y la altura total! */
 body {
-  /* ¡Quitamos margin y padding de aquí también por si acaso! Ya está en el * */
   margin: 0;
   padding: 0;
-  font-family: 'Montserrat', sans-serif; /* Fuente por defecto */
+  font-family: 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* overflow-x: hidden; ESTO YA LO PUSIMOS EN HTML O main-content-wrapper */
   
   background-image: url('./assets/ambaria.mp4');
   background-size: cover; /* ¡Cubre TODA LA PANTALLA sin distorsionar! */
@@ -35,14 +29,11 @@ body {
   background-repeat: no-repeat;
   background-color: #1a1a32; /* Fallback color */
 
-  /* ALTURA MÍNIMA: Asegura que el body ocupe AL MENOS toda la altura de la ventana.
-     Esto es CRÍTICO para el "margen blanco al pie de página". */
   min-height: 100vh;
   height: 100%; /* Asegura que se estire al 100% de su padre (html) */
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* ESTILOS DE CÓDIGO (EXISTENTES) */
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
@@ -75,8 +66,8 @@ code {
     flex-direction: column;
     min-height: 100vh;
     width: 100vw; /* Usamos 100vw para asegurar que ocupe todo el ancho del viewport */
-    position: relative; /* Necesario para que el z-index del navbar funcione bien */
-    /* El padding-top para el Navbar fijo se mantiene en App.jsx */
+    position: relative;
+    overflow-x: hidden; /* Asegura que el App no tenga scroll horizontal */
 }
 
 img {
@@ -87,7 +78,6 @@ img {
 
 /* ----------------------------------------------------- */
 /* CLASE PARA CONTENEDORES DE PÁGINA: 'main-content-wrapper' */
-/* ¡CRÍTICO PARA RESOLVER EL DESBORDAMIENTO DEL DIV Y LOS MÁRGENES! */
 /* ===================================================== */
 
 /* Estilos por defecto para MÓVILES (Ancho de pantalla hasta 767px) */
@@ -145,13 +135,6 @@ button { padding: 10px 20px; font-size: 1em; }
         padding: 60px 80px;
         max-width: 1200px; /* Limita el ancho del CONTENEDOR DE LA PÁGINA en escritorio */
         margin: 0 auto;
-    }
-    /* NUEVA REGLA: Establecemos un maxWidth para las "cajas de contenido" (contentBoxStyle) en escritorio */
-    /* Este selector busca un div que sea hijo directo de .main-content-wrapper Y que tenga el color de fondo de contentBoxStyle */
-    .main-content-wrapper > div[style*="background-color: rgba(42, 42, 74, 0.7)"] {
-        max-width: 800px; /* ¡AQUÍ ESTÁ LA MAGIA! Limita el ancho de la caja principal de Contacto/Upload */
-        width: 100%; /* Asegura que siga siendo 100% de su padre (main-content-wrapper) */
-        margin: 20px auto; /* Centra la caja dentro de main-content-wrapper */
     }
 
     h1 { font-size: 3.5em; }
