@@ -1,25 +1,30 @@
+// frontend/src/styles/commonStyles.jsx
+
+// Estilo para el contenedor principal de la página (AHORA SÓLO PARA COLORES/FONTES/COSAS NO DE LAYOUT)
+// Las propiedades de layout (ancho, alto mínimo, centrado, padding superior) serán manejadas
+// por la clase 'main-content-wrapper' en index.css.
 export const pageContainerStyle = {
   backgroundColor: 'transparent', // Crucial para ver el VideoBackground
-  minHeight: '100vh',
   color: 'white',
-  padding: '20px', // Mantiene el padding general
-  paddingTop: '80px', // <--- ¡NUEVA LÍNEA CLAVE! Añade espacio desde la parte superior para la NavBar
   fontFamily: 'Arial, sans-serif',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center', // Centra horizontalmente el contenido principal
+  // minHeight, padding, paddingTop, display, flexDirection, alignItems
+  // ¡ESTAS PROPIEDADES FUERON ELIMINADAS O SIMPLIFICADAS PORQUE ENTRAN EN CONFLICTO CON main-content-wrapper!
+  // El paddingTop se gestionará en App.jsx para compensar el navbar fijo.
+  // El minHeight será del body y del main-content-wrapper.
+  // El centrado y display/flexDirection será del main-content-wrapper.
 };
 
 // Estilo para la caja de contenido central (la tarjeta que contiene el formulario/listado)
-// Esta es la que suele tener el fondo rgba y sombra
+// Las propiedades de layout (maxWidth, margin, width) serán manejadas por la clase o por el componente padre.
+// Aquí solo mantenemos las propiedades visuales de la "caja".
 export const contentBoxStyle = {
-  maxWidth: '800px', // O el valor que necesites para cada componente
-  margin: '20px auto', // Margen superior/inferior y centrado horizontal
+  // maxWidth: '800px', // ¡ELIMINADO! Esto lo manejará el CSS global o el componente específico.
+  // margin: '20px auto', // ¡ELIMINADO! Esto lo manejará el CSS global.
   padding: '30px',
   backgroundColor: 'rgba(42, 42, 74, 0.7)', // Fondo semi-transparente
   borderRadius: '10px',
   boxShadow: '0 0 15px rgba(0, 255, 255, 0.5)',
-  width: '100%', // Asegura que ocupe el ancho disponible dentro del max-width
+  // width: '100%', // ¡ELIMINADO! Esto lo manejará el CSS global o el componente específico.
 };
 
 // Puedes añadir más estilos comunes aquí si los identificas

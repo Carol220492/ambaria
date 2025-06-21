@@ -102,22 +102,22 @@ const HomePodcasts = () => {
   }
 
   return (
-    // AÑADIDO: className="main-content-wrapper" al div principal
-    <div className="main-content-wrapper" style={pageContainerStyle}> {/* pageContainerStyle si es el contenedor más externo */}
-      {/* contentBoxStyle ya tiene max-width, no queremos conflicto con main-content-wrapper */}
-      <div style={{ ...contentBoxStyle, maxWidth: '100%', margin: '0 auto' }}> {/* Ajustado maxWidth y margin */}
+    // AÑADIDO: className="main-content-wrapper" al div principal.
+    // pageContainerStyle se mantiene para los estilos específicos que ya tenías.
+    <div className="main-content-wrapper" style={pageContainerStyle}>
+      {/* contentBoxStyle ya tiene max-width. Lo ajustamos para que no desborde en móvil. */}
+      <div style={{ ...contentBoxStyle, width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
         <h1 style={{ color: '#00FFFF', marginBottom: '20px', textAlign: 'center' }}>Explorar Podcasts</h1>
 
         {/* --- CARRUSEL DE CATEGORÍAS (flex-container-responsive para apilar en móvil) --- */}
-        <div className="flex-container-responsive" style={{ // Añadida clase y estilos inline ajustados
-          overflowX: 'auto',
-          whiteSpace: 'nowrap',
+        {/* Aquí usaremos la clase flex-container-responsive para que se apile en móvil */}
+        <div className="flex-container-responsive" style={{
+          overflowX: 'auto', // Permite scroll horizontal si las categorías son muchas
+          whiteSpace: 'nowrap', // Mantiene los elementos en una sola línea hasta que se apilen
           paddingBottom: '10px',
           marginBottom: '30px',
-          gap: '10px', // Managed by flex-container-responsive
-          justifyContent: 'center', // Managed by flex-container-responsive
-          /* Los estilos display: 'flex', flexDirection: 'column' para móvil
-             y 'row' para desktop se manejarán por flex-container-responsive en index.css */
+          /* Los estilos de display, flex-direction, gap, justifyContent, alignItems
+             se manejarán por la clase 'flex-container-responsive' en index.css */
         }}>
           {categories.map((category) => (
             <button
@@ -130,7 +130,9 @@ const HomePodcasts = () => {
                 padding: '8px 15px',
                 borderRadius: '20px',
                 cursor: 'pointer',
-                flexShrink: 0,
+                flexShrink: 0, // Evita que los botones se encojan
+                minWidth: 'auto', // Permite que el ancho del botón se ajuste a su contenido
+                margin: '5px' // Añade un pequeño margen entre botones
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = selectedCategory === category ? '#0056b3' : '#777'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = selectedCategory === category ? '#007bff' : '#555'}
@@ -145,8 +147,9 @@ const HomePodcasts = () => {
         <div style={{ 
             display: 'grid', 
             // Usa auto-fit y un minmax más pequeño para móvil para permitir más columnas
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', 
-            gap: '20px', // Ajustado a 20px para mejor espacio en móvil
+            // minmax(150px, 1fr) -> cada columna tendrá mínimo 150px, si hay espacio, crecerá
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+            gap: '20px', // Espacio entre tarjetas
             justifyContent: 'center', // Centrar la cuadrícula si hay pocas columnas
             alignItems: 'stretch' // Asegura que las tarjetas tengan la misma altura si están en fila
         }}>

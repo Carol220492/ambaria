@@ -166,8 +166,9 @@ const Profile = () => {
   }
 
   return (
+    // AÑADIDO: className="main-content-wrapper" al div principal
     <div className="main-content-wrapper" style={pageContainerStyle}>
-      <div style={{ ...contentBoxStyle, maxWidth: '100%', margin: '0 auto' }}>
+      <div style={{ ...contentBoxStyle, width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
         <h1 style={{ color: '#00FFFF', marginBottom: '20px' }}>Mi Perfil</h1>
 
         <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
@@ -210,13 +211,12 @@ const Profile = () => {
         ) : userPodcasts.length === 0 ? (
           <div style={{ textAlign: 'center', color: '#ccc' }}>Aún no has subido ningún podcast.</div>
         ) : (
-          /* CORRECCIÓN: Aquí faltaba una llave de cierre '}' */
-          <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', /* Ajuste para móvil */
-              gap: '20px', /* Espacio entre tarjetas */
-              justifyContent: 'center', /* Centrar la cuadrícula si hay pocas columnas */
-              alignItems: 'stretch' /* Asegura que las tarjetas tengan la misma altura */
+          <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', // Ajuste para móvil: min 150px, máx 1fr
+              gap: '20px', // Espacio entre tarjetas
+              justifyContent: 'center', // Centrar la cuadrícula si hay pocas columnas
+              alignItems: 'stretch' // Asegura que las tarjetas tengan la misma altura
           }}>
             {userPodcasts.map((podcast) => (
               <div key={podcast.id} style={{
@@ -236,7 +236,7 @@ const Profile = () => {
                     style={{
                       width: '100%',
                       height: 'auto',
-                      maxHeight: '150px', /* Limita la altura para móvil */
+                      maxHeight: '150px', // Limita la altura para móvil
                       objectFit: 'cover',
                       borderRadius: '4px',
                       marginBottom: '10px'
