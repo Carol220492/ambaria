@@ -33,7 +33,7 @@ if not os.path.exists(instance_path):
 
 app.secret_key = app.config['SECRET_KEY']
 
-CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
+CORS(app, supports_credentials=True, origins=["http://localhost:3000", "https://ambaria-frontend.onrender.com"])
 
 db.init_app(app)
 migrate = Migrate(app, db)
