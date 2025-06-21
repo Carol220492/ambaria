@@ -147,12 +147,12 @@ const Profile = () => {
 
 
   if (loading) {
-    return <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>Cargando perfil...</div>;
+    return <div className="main-content-wrapper" style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>Cargando perfil...</div>;
   }
 
   if (error) {
     return (
-      <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
+      <div className="main-content-wrapper" style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
         <p>{error}</p>
         <button onClick={() => navigate('/')} style={primaryButtonStyle}>
           Ir a Iniciar Sesión
@@ -162,12 +162,12 @@ const Profile = () => {
   }
 
   if (!userData) {
-      return <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>No se encontraron datos de usuario.</div>;
+      return <div className="main-content-wrapper" style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>No se encontraron datos de usuario.</div>;
   }
 
   return (
-    <div style={pageContainerStyle}>
-      <div style={contentBoxStyle}>
+    <div className="main-content-wrapper" style={pageContainerStyle}>
+      <div style={{ ...contentBoxStyle, maxWidth: '100%', margin: '0 auto' }}>
         <h1 style={{ color: '#00FFFF', marginBottom: '20px' }}>Mi Perfil</h1>
 
         <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
@@ -193,11 +193,7 @@ const Profile = () => {
             </Link>
         </div>
 
-        {/* ELIMINADO EL BLOQUE DE IMAGEN DE PERFIL */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '30px', borderBottom: '1px solid #444', paddingBottom: '20px' }}>
-          {/* ANTES: {userData.profile_picture && (
-            <img src={userData.profile_picture} alt="Foto de Perfil" style={{ borderRadius: '50%', width: '120px', height: '120px', objectFit: 'cover', marginRight: '20px', border: '3px solid #cc00cc' }} />
-          )} */}
           <div>
             <p style={{ fontSize: '1.5em', fontWeight: 'bold', margin: '0 0 5px 0' }}>{userData.name || userData.email}</p>
             <p style={{ fontSize: '1em', color: '#ccc', margin: '0' }}>{userData.email}</p>
@@ -214,7 +210,14 @@ const Profile = () => {
         ) : userPodcasts.length === 0 ? (
           <div style={{ textAlign: 'center', color: '#ccc' }}>Aún no has subido ningún podcast.</div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }}>
+          /* CORRECCIÓN: Aquí faltaba una llave de cierre '}' */
+          <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', /* Ajuste para móvil */
+              gap: '20px', /* Espacio entre tarjetas */
+              justifyContent: 'center', /* Centrar la cuadrícula si hay pocas columnas */
+              alignItems: 'stretch' /* Asegura que las tarjetas tengan la misma altura */
+          }}>
             {userPodcasts.map((podcast) => (
               <div key={podcast.id} style={{
                 backgroundColor: '#3a3a5a',
@@ -232,7 +235,8 @@ const Profile = () => {
                     alt={podcast.title}
                     style={{
                       width: '100%',
-                      height: '150px',
+                      height: 'auto',
+                      maxHeight: '150px', /* Limita la altura para móvil */
                       objectFit: 'cover',
                       borderRadius: '4px',
                       marginBottom: '10px'
@@ -243,7 +247,7 @@ const Profile = () => {
                 <p style={{ color: '#ccc', fontSize: '0.9em', margin: '0 0 10px 0' }}>Artista: {podcast.artist}</p>
                 <p style={{ color: '#aaa', fontSize: '0.8em', margin: '0 0 15px 0', maxHeight: '60px', overflow: 'hidden' }}>{podcast.description}</p>
 
-                <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
+                <div style={{ display: 'flex', gap: '10px', marginTop: 'auto', width: '100%', justifyContent: 'center' }}>
                     <button
                         onClick={() => handleEditPodcast(podcast.id)}
                         style={primaryButtonStyle}

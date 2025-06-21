@@ -2,20 +2,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;700&display=swap');
 /* Mantengo Cinzel y Montserrat por ahora, pero la fuente del logo es crucial */
 
-/* ESTILOS EXISTENTES: Respetados */
+/* REINICIO BÁSICO Y BOX-SIZING UNIVERSAL: ¡CRUCIAL PARA LAYOUTS Y MARGENES! */
+/* Esto asegura que el padding y el border no añadan tamaño extra a los elementos,
+   evitando desbordamientos y cálculos incorrectos de ancho. */
+html {
+    box-sizing: border-box;
+    /* Asegura que el HTML también ocupe toda la altura de la ventana */
+    min-height: 100vh; 
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+/* ESTILOS DEL BODY (EXISTENTES Y MEJORADOS PARA EL FONDO) */
 body {
   margin: 0;
+  padding: 0; /* Aseguramos que no haya padding por defecto en el body */
   font-family: 'Montserrat', sans-serif; /* Fuente por defecto */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden; /* Evitar scroll horizontal */
+  overflow-x: hidden; /* Evitar scroll horizontal siempre */
   
-  background-image: url('./assets/ambaria.mp4'); /* Ruta a tu imagen */
-  background-size: cover; /* Cubre toda la pantalla sin distorsionar */
+  /* ESTILOS DEL FONDO DE VIDEO/IMAGEN: */
+  background-image: url('./assets/ambaria.mp4'); /* Ruta a tu imagen/video */
+  background-size: cover; /* ¡Cubre toda la pantalla sin distorsionar! */
   background-position: center center; /* Centra la imagen */
   background-attachment: fixed; /* Mantiene la imagen fija al hacer scroll */
   background-repeat: no-repeat; /* Evita que la imagen se repita */
+  /* FALLBACK COLOR: Este color se verá si el video no carga o si el contenido se desborda y el fondo fijo no cubre */
+  background-color: #1a1a32; /* Un tono oscuro que complementa tu video/fondo */
 
+  /* ALTURA MÍNIMA: Asegura que el body ocupe al menos toda la altura de la ventana.
+     Esto ayuda con el "margen blanco al pie de página". */
   min-height: 100vh;
   color: rgba(255, 255, 255, 0.8);
 }
@@ -25,7 +43,7 @@ code {
     monospace;
 }
 
-/* Estilos de scrollbar con la nueva paleta (EXISTENTES: Respetados) */
+/* Estilos de scrollbar con la nueva paleta (EXISTENTES) */
 ::-webkit-scrollbar {
     width: 10px;
 }
@@ -44,25 +62,16 @@ code {
 }
 
 /* ===================================================== */
-/* NUEVOS ESTILOS RESPONSIVOS GLOBALES (AÑADIDOS AQUÍ) */
+/* ESTILOS GLOBALES PARA LA APLICACIÓN Y RESPONSIVIDAD */
 /* ===================================================== */
 
-/* Reseteo básico para asegurar que el padding y border se incluyan en el ancho/alto */
-html {
-    box-sizing: border-box;
-}
-*, *:before, *:after {
-    box-sizing: inherit;
-}
-
-/* Contenedor principal de la aplicación React */
-/* Este div es el que envuelve todo el contenido dentro de tu App.jsx.
-   Ya tiene padding-top en App.jsx para el Navbar fijo. */
+/* Contenedor principal de la aplicación React (App.jsx) */
+/* Este div es el que envuelve todo el contenido dentro de tu App.jsx. */
 .App {
     display: flex;
     flex-direction: column;
-    /* min-height ya está en body, pero lo reforzamos aquí si es necesario */
-    min-height: 100vh;
+    min-height: 100vh; /* Asegura que la App ocupe al menos toda la altura */
+    /* El padding-top para el Navbar fijo se mantiene en App.jsx */
 }
 
 /* Reglas generales para imágenes fluidas */
@@ -73,16 +82,30 @@ img {
 }
 
 /* ----------------------------------------------------- */
-/* MEDIA QUERIES PARA RESPONSIVIDAD */
-/* (Diseño Móvil Primero: los estilos fuera de @media son para móviles) */
-/* ----------------------------------------------------- */
+/* CLASE PARA CONTENEDORES DE PÁGINA: 'main-content-wrapper' */
+/* Esta clase la aplicarás al DIV PRINCIPAL de cada uno de tus componentes de página
+   (Home.jsx, HomePodcasts.jsx, Profile.jsx, etc.) */
+/* ===================================================== */
 
 /* Estilos por defecto para MÓVILES (Ancho de pantalla hasta 767px) */
-/* Estos estilos se aplican a pantallas pequeñas. */
+.main-content-wrapper {
+    width: 100%; /* Ocupa el 100% del ancho disponible */
+    max-width: 100%; /* Asegura que no se desborde */
+    padding: 20px; /* Padding interno para que el contenido no pegue a los bordes */
+    margin: 0 auto; /* Centrar el contenedor, aunque en 100% no se notará mucho */
+    box-sizing: border-box; /* Asegura que el padding no cause desbordamiento */
+    /* Para el problema del fondo blanco al scrollear si el contenido es corto,
+       aseguramos que este wrapper tenga al menos el alto restante. */
+    min-height: calc(100vh - 80px); /* 100vh menos la altura aproximada del navbar */
+    display: flex; /* Para centrar contenido si es necesario */
+    flex-direction: column;
+    justify-content: flex-start; /* Alinea el contenido arriba */
+    align-items: center; /* Centra horizontalmente */
+}
 
-/* Ajustes de tamaño de fuente para pantallas pequeñas */
+/* Ajustes de tamaño de fuente global para pantallas pequeñas */
 h1 {
-    font-size: 2.2em; /* Más pequeño en móvil */
+    font-size: 2.2em; 
 }
 
 h2 {
@@ -93,14 +116,6 @@ p {
     font-size: 0.9em;
 }
 
-/* Ajustes de padding para contenedores de página en móvil */
-/* Debes añadir la clase 'page-container' a los divs principales de tus componentes (Home.jsx, Profile.jsx, etc.) */
-.page-container {
-    padding: 20px; /* Menos padding en los lados para móviles */
-    width: 100%; /* Asegura que ocupe todo el ancho disponible en móvil */
-    max-width: 100%; /* No se desborde */
-}
-
 /* Botones: más compactos en móvil */
 button {
     padding: 10px 20px;
@@ -108,15 +123,21 @@ button {
 }
 
 /* Contenedores flexibles que se apilan en móvil */
-/* Añade esta clase 'flex-container-responsive' a los divs que contienen elementos que quieres que se apilen verticalmente en móvil */
+/* Añade esta clase 'flex-container-responsive' a los divs que contienen elementos
+   que quieres que se apilen verticalmente en móvil y luego se pongan en fila. */
 .flex-container-responsive {
-    flex-direction: column; /* Apila los elementos verticalmente */
+    display: flex; /* Asegura que es un flex container */
+    flex-direction: column; /* Por defecto, apila en columna para móvil */
     align-items: center;    /* Centra los elementos al apilarse */
     gap: 20px;              /* Espacio entre elementos apilados */
 }
 
 /* Media Query para TABLETS (Ancho mínimo de 768px y máximo de 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
+    .main-content-wrapper {
+        padding: 40px; /* Más padding en tablets */
+        max-width: 90%; /* Limita el ancho en tablets para mejor legibilidad */
+    }
     h1 {
         font-size: 2.8em;
     }
@@ -126,23 +147,25 @@ button {
     p {
         font-size: 1em;
     }
-    .page-container {
-        padding: 40px; /* Más padding en tablets */
+    button {
+        padding: 12px 25px;
+        font-size: 1.1em;
     }
     .flex-container-responsive {
         flex-direction: row; /* Vuelven a la fila */
         justify-content: space-around; /* Distribuye los elementos */
     }
-    button {
-        padding: 12px 25px;
-        font-size: 1.1em;
-    }
 }
 
 /* Media Query para ESCRITORIO (Ancho mínimo de 1024px) */
 @media (min-width: 1024px) {
+    .main-content-wrapper {
+        padding: 60px 80px; /* Más padding en escritorio */
+        max-width: 1200px; /* Limita el ancho máximo en pantallas muy grandes */
+        margin: 0 auto; /* Centra el contenedor en pantallas grandes */
+    }
     h1 {
-        font-size: 3.5em; /* Tamaño completo para escritorio */
+        font-size: 3.5em; 
     }
     h2 {
         font-size: 2.5em;
@@ -150,18 +173,13 @@ button {
     p {
         font-size: 1.1em;
     }
-    .page-container {
-        padding: 60px 80px; /* Más padding en escritorio */
-        max-width: 1200px; /* Opcional: limita el ancho máximo en pantallas muy grandes */
-        margin: 0 auto; /* Centra el contenedor en pantallas grandes */
+    button {
+        padding: 15px 30px;
+        font-size: 1.2em;
     }
     .flex-container-responsive {
         flex-direction: row; /* Mantienen la fila */
         justify-content: space-between; /* Espacio entre los elementos */
-    }
-    button {
-        padding: 15px 30px;
-        font-size: 1.2em;
     }
 }
 
@@ -175,3 +193,4 @@ button {
         right: 2.5%;
     }
 }
+

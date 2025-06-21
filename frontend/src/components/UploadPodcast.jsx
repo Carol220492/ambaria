@@ -86,9 +86,9 @@ const UploadPodcast = () => {
     };
 
     return (
-        <div style={pageContainerStyle}>
-            {/* ELIMINA ESTA LÍNEA: <NavBar /> */} {/* <--- ¡ASEGÚRATE DE QUE ESTA LÍNEA NO ESTÉ! */}
-            <div style={contentBoxStyle}>
+        // AÑADIDO: className="main-content-wrapper" al div principal
+        <div className="main-content-wrapper" style={pageContainerStyle}>
+            <div style={{ ...contentBoxStyle, maxWidth: '100%', margin: '0 auto' }}> {/* Ajustado maxWidth y margin */}
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#00FFFF' }}>Subir Nuevo Podcast</h2>
 
                 <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>

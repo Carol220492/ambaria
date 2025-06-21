@@ -2,8 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-// ELIMINA ESTA LÍNEA: import NavBar from './NavBar';
-// IMPORTAR ESTILOS COMUNES
 import { pageContainerStyle, contentBoxStyle, formInputStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles.jsx';
 
 const EditPodcast = () => {
@@ -104,17 +102,19 @@ const EditPodcast = () => {
     };
 
     if (loading) {
-        return <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>Cargando datos del podcast...</div>;
+        // AÑADIDO: className="main-content-wrapper" para centrado responsivo
+        return <div className="main-content-wrapper" style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>Cargando datos del podcast...</div>;
     }
 
     if (error) {
-        return <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>Error: {error}</div>;
+        // AÑADIDO: className="main-content-wrapper" para centrado responsivo
+        return <div className="main-content-wrapper" style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>Error: {error}</div>;
     }
 
     return (
-        <div style={pageContainerStyle}>
-            {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
-            <div style={contentBoxStyle}>
+        // AÑADIDO: className="main-content-wrapper" al div principal
+        <div className="main-content-wrapper" style={pageContainerStyle}>
+            <div style={{ ...contentBoxStyle, maxWidth: '100%', margin: '0 auto' }}> {/* Ajustado maxWidth y margin */}
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#00FFFF' }}>Editar Podcast</h2>
 
                 <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>
@@ -185,7 +185,7 @@ const EditPodcast = () => {
                             onChange={handleFileChange}
                             style={formInputStyle}
                         />
-                        {audioFile && <p style={{ fontSize: '0.9em', color: '#ccc' }}>Seleccionado: {audioFile.name}</p>}
+                        {audioFile && <p style={{ fontSize: '0.9em', color: '#ccc' }}>Seleccionado: {audioFile.name}</p>}\
                     </div>
                     <div>
                         <label htmlFor="cover_image" style={{ display: 'block', marginBottom: '5px' }}>Cambiar Imagen de Portada (Opcional):</label>

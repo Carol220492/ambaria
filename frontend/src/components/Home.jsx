@@ -4,8 +4,6 @@ import { /* useNavigate, */ Link } from 'react-router-dom'; // Eliminamos useNav
 import { pageContainerStyle, primaryButtonStyle } from '../styles/commonStyles.jsx';
 
 const Home = () => {
-    // const navigate = useNavigate(); // Ya no es necesario si no se usa para navegación programática
-
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     const handleGoogleLogin = () => {
@@ -13,7 +11,9 @@ const Home = () => {
     };
 
     return (
-        <div style={{ ...pageContainerStyle, justifyContent: 'center' }}>
+        // AÑADIDO: className="main-content-wrapper" para que se centre y se adapte.
+        // pageContainerStyle se mantiene para los estilos específicos que tenías.
+        <div className="main-content-wrapper" style={{ ...pageContainerStyle, justifyContent: 'center' }}>
             <h1 style={{ color: '#00FFFF', fontSize: '3em', marginBottom: '20px' }}>Bienvenida a Ambaria</h1>
             <p style={{ fontSize: '1.1em', marginBottom: '30px' }}>Tribu de Historias</p>
 
@@ -42,11 +42,9 @@ const Home = () => {
                 Iniciar Sesión con Google
             </button>
 
-            {/* El Link a /contact sí se usa, así que lo mantenemos */}
             <p style={{ marginTop: '20px', color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.9em' }}>
               Al iniciar sesión, aceptas nuestros <a href="/terms" style={{ color: '#00FFFF', textDecoration: 'none' }}>Términos de Servicio</a> y <a href="/privacy" style={{ color: '#00FFFF', textDecoration: 'none' }}>Política de Privacidad</a>.
             </p>
-            {/* Si quieres que el enlace a /contact sea un Link de React Router, es correcto así */}
             <Link to="/contact" style={{ color: '#00FFFF', textDecoration: 'none', marginTop: '10px', display: 'block' }}>Contacto</Link>
         </div>
     );

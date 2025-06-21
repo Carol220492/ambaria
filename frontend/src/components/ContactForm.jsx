@@ -1,8 +1,6 @@
 // frontend/src/components/ContactForm.js
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-// ELIMINA ESTA LÍNEA: import NavBar from './NavBar';
-// IMPORTAR ESTILOS COMUNES
 import { pageContainerStyle, contentBoxStyle, formInputStyle, primaryButtonStyle, secondaryButtonStyle } from '../styles/commonStyles.jsx';
 
 const ContactForm = () => {
@@ -35,9 +33,9 @@ const ContactForm = () => {
     };
 
     return (
-        <div style={pageContainerStyle}>
-            {/* ELIMINA ESTA LÍNEA: <NavBar /> */}
-            <div style={contentBoxStyle}>
+        // AÑADIDO: className="main-content-wrapper" al div principal
+        <div className="main-content-wrapper" style={pageContainerStyle}>
+            <div style={{ ...contentBoxStyle, maxWidth: '100%', margin: '0 auto' }}> {/* Ajustado maxWidth y margin */}
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#00FFFF' }}>Contáctanos</h2>
 
                 <div style={{ marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-start' }}>

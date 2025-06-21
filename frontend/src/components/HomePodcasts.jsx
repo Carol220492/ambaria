@@ -13,13 +13,11 @@ const HomePodcasts = () => {
   const isPlaying = audioPlayerStore.getState().isPlaying;
   const navigate = useNavigate();
 
-  // --- NUEVOS ESTADOS PARA CATEGORÍAS Y FILTRO ---
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-  // Efecto para obtener PODCASTS (ahora con filtro de categoría)
   useEffect(() => {
     const fetchPodcasts = async () => {
       const token = localStorage.getItem('jwt_token');
@@ -60,7 +58,6 @@ const HomePodcasts = () => {
     fetchPodcasts();
   }, [navigate, API_URL, selectedCategory]);
 
-  // --- NUEVO EFECTO PARA OBTENER CATEGORÍAS ---
   useEffect(() => {
     const fetchCategories = async () => {
       const token = localStorage.getItem('jwt_token');
@@ -86,16 +83,18 @@ const HomePodcasts = () => {
   };
 
   if (loading && podcasts.length === 0) {
+    // AÑADIDO: className="main-content-wrapper" para centrado responsivo
     return (
-      <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>
+      <div className="main-content-wrapper" style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start' }}>
         <p>Cargando podcasts...</p>
       </div>
     );
   }
 
   if (error) {
+    // AÑADIDO: className="main-content-wrapper" para centrado responsivo
     return (
-      <div style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
+      <div className="main-content-wrapper" style={{ ...pageContainerStyle, textAlign: 'center', justifyContent: 'flex-start', color: 'red' }}>
         <p>{error}</p>
         <button onClick={() => navigate('/')} style={primaryButtonStyle}>Volver a Iniciar Sesión</button>
       </div>
@@ -103,19 +102,22 @@ const HomePodcasts = () => {
   }
 
   return (
-    <div style={pageContainerStyle}>
-      <div style={{ ...contentBoxStyle, maxWidth: '1200px' }}>
+    // AÑADIDO: className="main-content-wrapper" al div principal
+    <div className="main-content-wrapper" style={pageContainerStyle}> {/* pageContainerStyle si es el contenedor más externo */}
+      {/* contentBoxStyle ya tiene max-width, no queremos conflicto con main-content-wrapper */}
+      <div style={{ ...contentBoxStyle, maxWidth: '100%', margin: '0 auto' }}> {/* Ajustado maxWidth y margin */}
         <h1 style={{ color: '#00FFFF', marginBottom: '20px', textAlign: 'center' }}>Explorar Podcasts</h1>
 
-        {/* --- CARRUSEL DE CATEGORÍAS --- */}
-        <div style={{
+        {/* --- CARRUSEL DE CATEGORÍAS (flex-container-responsive para apilar en móvil) --- */}
+        <div className="flex-container-responsive" style={{ // Añadida clase y estilos inline ajustados
           overflowX: 'auto',
           whiteSpace: 'nowrap',
           paddingBottom: '10px',
           marginBottom: '30px',
-          display: 'flex',
-          gap: '10px',
-          justifyContent: 'center',
+          gap: '10px', // Managed by flex-container-responsive
+          justifyContent: 'center', // Managed by flex-container-responsive
+          /* Los estilos display: 'flex', flexDirection: 'column' para móvil
+             y 'row' para desktop se manejarán por flex-container-responsive en index.css */
         }}>
           {categories.map((category) => (
             <button
@@ -139,7 +141,15 @@ const HomePodcasts = () => {
         </div>
         {/* --- FIN CARRUSEL DE CATEGORÍAS --- */}
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '30px' }}>
+        {/* GRID DE PODCASTS: Ajustado para ser responsivo */}
+        <div style={{ 
+            display: 'grid', 
+            // Usa auto-fit y un minmax más pequeño para móvil para permitir más columnas
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', 
+            gap: '20px', // Ajustado a 20px para mejor espacio en móvil
+            justifyContent: 'center', // Centrar la cuadrícula si hay pocas columnas
+            alignItems: 'stretch' // Asegura que las tarjetas tengan la misma altura si están en fila
+        }}>
           {podcasts.length === 0 && !loading ? (
             <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#ccc' }}>No se encontraron podcasts para esta categoría.</p>
           ) : (
@@ -166,8 +176,9 @@ const HomePodcasts = () => {
                     src={podcast.cover_image_url}
                     alt={podcast.title}
                     style={{
-                      width: '100%',
-                      height: '200px',
+                      width: '100%', // Asegura que la imagen sea fluida dentro de su contenedor
+                      height: 'auto', // Mantiene la proporción
+                      maxHeight: '180px', // Limita la altura para que no sean demasiado grandes en móvil
                       objectFit: 'cover',
                       borderRadius: '8px',
                       marginBottom: '15px',
